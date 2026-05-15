@@ -17,12 +17,12 @@
 /**
  * Competency column for Question Bank.
  *
- * @package    qbank_yetkinlik
- * @copyright  2026 Hakan Çiğci {@link https://hakancigci.com.tr}
+ * @package    qbank_competency
+ * @copyright  2026 Hakan Ã‡iÄŸci {@link https://hakancigci.com.tr}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace qbank_yetkinlik\column;
+namespace qbank_competency\column;
 
 use core_question\local\bank\column_base;
 use html_writer;
@@ -31,8 +31,8 @@ use stdClass;
 /**
  * Competency column for Question Bank.
  *
- * @package    qbank_yetkinlik
- * @author     Hakan Çiğci
+ * @package    qbank_competency
+ * @author     Hakan Ã‡iÄŸci
  */
 class competency_column extends column_base {
     /** @var array $competencyoptions Store available competencies for the course. */
@@ -46,7 +46,7 @@ class competency_column extends column_base {
     public function init(): void {
         parent::init();
         global $PAGE;
-        $PAGE->requires->js_call_amd('qbank_yetkinlik/mapping', 'init');
+        $PAGE->requires->js_call_amd('qbank_competency/mapping', 'init');
     }
 
     /**
@@ -55,7 +55,7 @@ class competency_column extends column_base {
      * @return string
      */
     public function get_name(): string {
-        return 'yetkinlik';
+        return 'competency';
     }
 
     /**
@@ -64,7 +64,7 @@ class competency_column extends column_base {
      * @return string
      */
     public function get_title(): string {
-        return get_string('competency', 'qbank_yetkinlik');
+        return get_string('competency', 'qbank_competency');
     }
 
     /**
@@ -95,17 +95,17 @@ class competency_column extends column_base {
             return;
         }
 
-        $current = $DB->get_field('qbank_yetkinlik_qmap', 'competencyid', [
+        $current = $DB->get_field('qbank_competency_qmap', 'competencyid', [
             'courseid'   => $courseid,
             'questionid' => $questionid,
         ]);
 
         $elementid = 'competency_' . $questionid;
-        $options = [0 => '—'] + $this->competencyoptions;
+        $options = [0 => 'â€”'] + $this->competencyoptions;
 
         echo html_writer::select($options, $elementid, $current, false, [
             'id'              => $elementid,
-            'class'           => 'yetkinlik-select custom-select',
+            'class'           => 'competency-select custom-select',
             'data-questionid' => $questionid,
             'data-courseid'   => $courseid,
         ]);
@@ -127,6 +127,6 @@ class competency_column extends column_base {
      * @return array
      */
     public function get_extra_classes(): array {
-        return ['pe-2', 'qbank_yetkinlik_column'];
+        return ['pe-2', 'qbank_competency_column'];
     }
 }

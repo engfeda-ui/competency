@@ -17,12 +17,12 @@
 /**
  * External API class for saving question competency mapping.
  *
- * @package    qbank_yetkinlik
- * @copyright  2026 Hakan Çiğci {@link https://hakancigci.com.tr}
+ * @package    qbank_competency
+ * @copyright  2026 Hakan Ã‡iÄŸci {@link https://hakancigci.com.tr}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace qbank_yetkinlik\external;
+namespace qbank_competency\external;
 
 use stdClass;
 use context_course;
@@ -33,8 +33,8 @@ use core_external\external_value;
 /**
  * External service class for saving question competencies.
  *
- * @package    qbank_yetkinlik
- * @copyright  2026 Hakan Çiğci {@link https://hakancigci.com.tr}
+ * @package    qbank_competency
+ * @copyright  2026 Hakan Ã‡iÄŸci {@link https://hakancigci.com.tr}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class save_question_competency extends external_api {
@@ -74,7 +74,7 @@ class save_question_competency extends external_api {
         self::validate_context($context);
         require_capability('moodle/course:manageactivities', $context);
 
-        $table = 'qbank_yetkinlik_qmap';
+        $table = 'qbank_competency_qmap';
         $conditions = [
             'questionid' => $params['questionid'],
             'courseid'   => $params['courseid'],

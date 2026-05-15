@@ -15,18 +15,18 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Web service function definitions for qbank_yetkinlik.
+ * Web service function definitions for qbank_competency.
  *
- * @package    qbank_yetkinlik
- * @copyright  2026 Hakan Çiğci {@link https://hakancigci.com.tr}
+ * @package    qbank_competency
+ * @copyright  2026 Hakan Ã‡iÄŸci {@link https://hakancigci.com.tr}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $functions = [
-    'qbank_yetkinlik_save_question_competency' => [
-        'classname'   => 'qbank_yetkinlik\external\save_question_competency',
+    'qbank_competency_save_question_competency' => [
+        'classname'   => 'qbank_competency\external\save_question_competency',
         'methodname'  => 'execute',
         'description' => 'The question records competency.',
         'type'        => 'write',

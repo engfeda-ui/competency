@@ -16,8 +16,8 @@
 /**
  * Ajax for competency records.
  *
- * @module      local_yetkinlik/charts
- * @copyright   2026 Hakan Çiğci {@link https://hakancigci.com.tr}
+ * @module      local_competency/charts
+ * @copyright   2026 Hakan Ã‡iÄŸci {@link https://hakancigci.com.tr}
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -25,20 +25,20 @@ import Ajax from 'core/ajax';
 import Notification from 'core/notification';
 
 export const init = () => {
-    const selects = document.querySelectorAll('.yetkinlik-select');
+    const selects = document.querySelectorAll('.competency-select');
     selects.forEach(select => {
         select.addEventListener('change', async(e) => {
             const target = e.target;
             try {
                 await Ajax.call([{
-                    methodname: 'qbank_yetkinlik_save_question_competency',
+                    methodname: 'qbank_competency_save_question_competency',
                     args: {
                         questionid: target.dataset.questionid,
                         competencyid: target.value,
                         courseid: target.dataset.courseid
                     }
                 }])[0];
-                // Başarılı!
+                // BaÅŸarÄ±lÄ±!
             } catch (error) {
                 Notification.exception(error);
             }

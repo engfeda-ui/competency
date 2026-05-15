@@ -17,12 +17,12 @@
 /**
  * Question bank plugin features definition.
  *
- * @package    qbank_yetkinlik
- * @copyright  2026 Hakan Çiğci {@link https://hakancigci.com.tr}
+ * @package    qbank_competency
+ * @copyright  2026 Hakan Ã‡iÄŸci {@link https://hakancigci.com.tr}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace qbank_yetkinlik\privacy;
+namespace qbank_competency\privacy;
 
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
@@ -30,10 +30,10 @@ use core_privacy\local\request\contextlist;
 use core_privacy\local\request\context;
 
 /**
- * Privacy Provider for qbank_yetkinlik plugin.
+ * Privacy Provider for qbank_competency plugin.
  *
- * @package    qbank_yetkinlik
- * @copyright  2026 Hakan Çiğci
+ * @package    qbank_competency
+ * @copyright  2026 Hakan Ã‡iÄŸci
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements
@@ -47,7 +47,7 @@ class provider implements
      */
     public static function get_metadata(collection $items): collection {
         $items->add_database_table(
-            'qbank_yetkinlik_qmap',
+            'qbank_competency_qmap',
             [
                 'userid' => 'privacy:metadata:userid',
                 'competencyid' => 'privacy:metadata:competencyid',
@@ -70,7 +70,7 @@ class provider implements
 
         $sql = "SELECT c.id
                   FROM {context} c
-                  JOIN {qbank_yetkinlik_qmap} t ON t.contextid = c.id
+                  JOIN {qbank_competency_qmap} t ON t.contextid = c.id
                  WHERE t.userid = :userid";
 
         $contextlist->add_from_sql($sql, ['userid' => $userid]);

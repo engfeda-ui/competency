@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * English strings for qbank_yetkinlik plugin.
+ * English strings for qbank_competency plugin.
  *
- * @package    qbank_yetkinlik
- * @copyright  2026 Hakan Çiğci {@link https://hakancigci.com.tr}
+ * @package    qbank_competency
+ * @copyright  2026 Hakan Ã‡iÄŸci {@link https://hakancigci.com.tr}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -33,4 +33,4 @@ $string['privacy:metadata:description'] = 'This table stores the relations betwe
 $string['privacy:metadata:timecreated'] = 'The timestamp indicating when the question-competency mapping was created.';
 $string['privacy:metadata:userid'] = 'The identifier for the user who is associated with the competency mapping.';
 $string['selectcompetency'] = 'Select competency...';
-$string['yetkinlik'] = 'Competency';
+$string['competency'] = 'Competency';
