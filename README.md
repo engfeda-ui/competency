@@ -8,7 +8,7 @@ A Moodle **Question Bank Competency** plugin. This plugin links questions in the
 - Multi‑language support via Moodle’s language system
 
 ## Installation
-1. Copy this plugin into `moodle/question/qbank/yetkinlik`.
+1. Copy this plugin into `moodle/question/bank/yetkinlik`.
 2. In Moodle, go to **Site administration → Plugins → Install plugins**.
 3. Complete the installation wizard.
 4. Purge caches.
