@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="question/bank/yetkinlik/db" VERSION="2026031240" COMMENT="XMLDB file for qbank_yetkinlik plugin">
+    <TABLES>
+        <TABLE NAME="qbank_yetkinlik_qmap" COMMENT="Table for mapping questions to specific competencies">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="The ID of the course where the mapping belongs"/>
+                <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="The ID of the question to be mapped"/>
+                <FIELD NAME="competencyid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="The ID of the associated competency"/>
+                <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" COMMENT="The timestamp when this mapping was created"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="coursefk" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
+                <KEY NAME="questionfk" TYPE="foreign" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
+            </KEYS>
+            <INDEXES>
+                <INDEX NAME="course_question_idx" UNIQUE="false" FIELDS="courseid, questionid" COMMENT="Index to speed up competency lookups for questions within a specific course"/>
+            </INDEXES>
+        </TABLE>
+    </TABLES>
+</XMLDB>
+
+
+
+
+
+
+
+
