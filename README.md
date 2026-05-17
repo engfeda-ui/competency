@@ -95,5 +95,5 @@ graph TD
 
 ## 📄 License & Credits
 
-- **Copyright:** © 2026 Hakan Çiğci ([https://hakancigci.com.tr](https://hakancigci.com.tr))
+- **Copyright:** © 2026 Mahmoud Salem
 - **License:** Licensed under the [GNU GPL v3 License](http://www.gnu.org/copyleft/gpl.html) (or later).
