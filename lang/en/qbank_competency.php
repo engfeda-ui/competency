@@ -33,4 +33,3 @@ $string['privacy:metadata:description'] = 'This table stores the relations betwe
 $string['privacy:metadata:timecreated'] = 'The timestamp indicating when the question-competency mapping was created.';
 $string['privacy:metadata:userid'] = 'The identifier for the user who is associated with the competency mapping.';
 $string['selectcompetency'] = 'Select competency...';
-$string['competency'] = 'Competency';

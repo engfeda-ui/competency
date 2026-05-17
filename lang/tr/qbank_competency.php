@@ -32,4 +32,3 @@ $string['privacy:metadata:competencyid'] = 'The identifier for the competency as
 $string['privacy:metadata:description'] = 'This table stores the relations between questions and competencies to track student performance.';
 $string['privacy:metadata:timecreated'] = 'The timestamp indicating when the question-competency mapping was created.';
 $string['selectcompetency'] = 'Competency seÃ§iniz...';
-$string['competency'] = 'Competency';
