@@ -18,7 +18,7 @@
  * External API class for saving question competency mapping.
  *
  * @package    qbank_competency
-  * @copyright  2026 Mahmoud Salem
+ * @copyright  2026 Mahmoud Salem
  * @copyright  based on work by 2026 Hakan Ã‡iÄŸci {@link https://hakancigci.com.tr}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -35,7 +35,7 @@ use core_external\external_value;
  * External service class for saving question competencies.
  *
  * @package    qbank_competency
-  * @copyright  2026 Mahmoud Salem
+ * @copyright  2026 Mahmoud Salem
  * @copyright  based on work by 2026 Hakan Ã‡iÄŸci {@link https://hakancigci.com.tr}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
