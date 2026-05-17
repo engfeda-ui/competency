@@ -7,6 +7,12 @@ A Moodle **Question Bank Competency** plugin. This plugin links questions in the
 - Fully compatible with Moodleâ€™s core competency framework
 - Multiâ€‘language support via Moodleâ€™s language system
 
+## Requirements & Compatibility
+
+- **Moodle Compatibility:** Moodle 4.5+ (including Moodle 5.0+). Tested successfully against `MOODLE_405_STABLE`.
+- **PHP Compatibility:** PHP 8.1, 8.2, and 8.3.
+- **Database:** PostgreSQL (13+) or MySQL/MariaDB.
+
 ## Installation
 1. Copy this plugin into `moodle/question/bank/competency`.
 2. In Moodle, go to **Site administration â†’ Plugins â†’ Install plugins**.
