@@ -24,8 +24,6 @@
 
 namespace qbank_competency;
 
-defined('MOODLE_INTERNAL') || die();
-
 use stdClass;
 
 /**
@@ -36,7 +34,6 @@ use stdClass;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class observer {
-
     /**
      * Observer for core tag_added event.
      *
@@ -68,7 +65,7 @@ class observer {
             $tagname,
             $competencycode,
             $tagname,
-            $competencycode
+            $competencycode,
         ], '*', IGNORE_MULTIPLE);
 
         if (!$competency) {
@@ -133,7 +130,7 @@ class observer {
             $tagname,
             $competencycode,
             $tagname,
-            $competencycode
+            $competencycode,
         ], '*', IGNORE_MULTIPLE);
 
         if (!$competency) {
