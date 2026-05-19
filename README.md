@@ -17,6 +17,7 @@ By mapping questions to learning outcomes, educators can measure exactly which s
 - **Native Moodle Core Competency Integration:** Fully integrated with Moodle’s official competency framework (`\core_competency\api`).
 - **Data Foundation for Analytics:** Works as the core data engine for downstream reporting plugins like `local_competency_report` and `block_competency_report`.
 - **Clean UI Integration:** Adds a intuitive competency management interface directly inside the Moodle Question Bank edit screen.
+- **Automated Tag-Based Mapping:** Automatically links imported questions (e.g. from GIFT files) or manually tagged questions to their respective competencies in the background using Moodle's native tag event observers.
 - **Enterprise Standards:**
   - Fully supports Moodle's language translation system (includes English and Turkish out-of-the-box).
   - Robust backup & restore support to keep mapping data intact when migrating courses.
@@ -57,6 +58,22 @@ Once installed, mapping competencies to questions is simple:
 3. Select the competency framework and choose the specific competency (or competencies) associated with this question.
 4. Save the mapping.
 5. **Downstream Reporting:** To generate reports and analyze student performance on these competency-linked questions, ensure you have installed the `local_competency_report` and `block_competency_report` plugins!
+
+---
+
+## 🏷️ Automated Competency Mapping (GIFT Import)
+
+The plugin features a robust, event-driven automated mapping system. You can automatically map imported questions to their corresponding competencies by using standard Moodle GIFT format comment tags.
+
+### How it works:
+1. **Add Tag to GIFT File:** When writing your questions in a GIFT text file, include the competency tag inside a comment line immediately preceding the question (prefixed by `comp-`):
+   ```text
+   // [tag:comp-101]
+   ::Question Name:: Which database does Moodle support? { =All of them ~Only one }
+   ```
+2. **Import Question:** Import the GIFT file into your Moodle course Question Bank.
+3. **Automatic Mapping:** Moodle's native tag engine processes `comp-101`, which triggers `qbank_competency`'s background event observer. The plugin automatically looks up the competency (via `idnumber` or `shortname`) and creates the mapping record inside Moodle without any manual intervention!
+4. **Automatic Cleanup:** If you later remove the `comp-101` tag from the question in Moodle, the plugin's tag-removal observer will clean up and delete the competency mapping automatically.
 
 ---
 
