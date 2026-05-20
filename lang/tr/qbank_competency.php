@@ -25,11 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['competency'] = 'Competency / KazanÄ±m';
+$string['competency'] = 'Competency / Kazanım';
 $string['none'] = 'Yok';
-$string['pluginname'] = 'Soru BankasÄ± Competency EÅŸleÅŸtirme';
-$string['privacy:metadata'] = 'Soru BankasÄ± Competency eklentisi herhangi bir kiÅŸisel veri depolamaz; sadece sorular ile competencyler arasÄ±ndaki eÅŸleÅŸtirmeleri saklar.';
-$string['privacy:metadata:competencyid'] = 'The identifier for the competency assigned to the question.';
-$string['privacy:metadata:description'] = 'This table stores the relations between questions and competencies to track student performance.';
-$string['privacy:metadata:timecreated'] = 'The timestamp indicating when the question-competency mapping was created.';
-$string['selectcompetency'] = 'Competency seÃ§iniz...';
+$string['pluginname'] = 'Soru Bankası Competency Eşleştirme';
+$string['privacy:metadata'] = 'Soru Bankası Competency eklentisi herhangi bir kişisel veri depolamaz; sadece sorular ile competencyler arasındaki eşleştirmeleri saklar.';
+$string['selectcompetency'] = 'Competency seçiniz...';

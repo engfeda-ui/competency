@@ -47,16 +47,10 @@ class provider implements
      * @return collection The updated set of items.
      */
     public static function get_metadata(collection $items): collection {
-        $items->add_database_table(
-            'qbank_competency_qmap',
-            [
-                'userid' => 'privacy:metadata:userid',
-                'competencyid' => 'privacy:metadata:competencyid',
-                'timecreated' => 'privacy:metadata:timecreated',
-            ],
-            'privacy:metadata:description'
-        );
-
+        // The qbank_competency_qmap table stores question-to-competency mappings.
+        // It does NOT store personal user data — mappings are created by teachers,
+        // not by students. The table has no userid or contextid column.
+        // No personal data is stored by this plugin.
         return $items;
     }
 
@@ -67,16 +61,8 @@ class provider implements
      * @return contextlist The contextlist containing the list of contexts used by this user.
      */
     public static function get_contexts_for_userid(int $userid): contextlist {
-        $contextlist = new contextlist();
-
-        $sql = "SELECT c.id
-                  FROM {context} c
-                  JOIN {qbank_competency_qmap} t ON t.contextid = c.id
-                 WHERE t.userid = :userid";
-
-        $contextlist->add_from_sql($sql, ['userid' => $userid]);
-
-        return $contextlist;
+        // No personal data stored — return empty contextlist.
+        return new contextlist();
     }
 
     /**

@@ -16,7 +16,7 @@
 /**
  * Ajax for competency records.
  *
- * @module      local_competency/charts
+ * @module      qbank_competency/mapping
   * @copyright  2026 Mahmoud Salem
  * @copyright  based on work by 2026 Hakan Ã‡iÄŸci {@link https://hakancigci.com.tr}
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
