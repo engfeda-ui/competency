@@ -4,23 +4,23 @@
 [![PHP Version](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-blue.svg?style=flat-square)](https://php.net)
 [![Database](https://img.shields.io/badge/Database-PostgreSQL%20%7C%20MySQL%20%7C%20MariaDB-purple.svg?style=flat-square)](https://docs.moodle.org)
 [![License](https://img.shields.io/badge/License-GPL%20v3-green.svg?style=flat-square)](http://www.gnu.org/copyleft/gpl.html)
+[![Version](https://img.shields.io/badge/Version-v2.0.9-blue.svg?style=flat-square)](https://github.com)
 
-A professional Moodle Question Bank plugin that allows course creators and teachers to link individual questions to specific Moodle competencies. This forms the bedrock of a robust competency-based assessment and learning analytics system in Moodle.
+A professional Moodle Question Bank plugin that allows course creators and teachers to link individual questions to specific Moodle competencies. This forms the data foundation of a competency-based assessment and learning analytics system.
 
-By mapping questions to learning outcomes, educators can measure exactly which skills a student has mastered, rather than just relying on generic pass/fail scores.
+By mapping questions to learning outcomes, educators can measure exactly which skills a student has mastered, rather than relying on generic pass/fail scores.
 
 ---
 
 ## ✨ Features
 
-- **Direct Question-to-Competency Mapping:** Link any question in the Moodle Question Bank to one or more Moodle competencies.
-- **Native Moodle Core Competency Integration:** Fully integrated with Moodle’s official competency framework (`\core_competency\api`).
-- **Data Foundation for Analytics:** Works as the core data engine for downstream reporting plugins like `local_competency_report` and `block_competency_report`.
-- **Clean UI Integration:** Adds a intuitive competency management interface directly inside the Moodle Question Bank edit screen.
-- **Automated Tag-Based Mapping:** Automatically links imported questions (e.g. from GIFT files) or manually tagged questions to their respective competencies in the background using Moodle's native tag event observers.
-- **Enterprise Standards:**
-  - Fully supports Moodle's language translation system (includes English and Turkish out-of-the-box).
-  - Robust backup & restore support to keep mapping data intact when migrating courses.
+- **Direct Question-to-Competency Mapping:** Link any question in the Moodle Question Bank to a Moodle competency via a dedicated column in the question bank UI.
+- **Native Moodle Core Competency Integration:** Fully integrated with Moodle's official competency framework (`\core_competency\api`).
+- **Data Foundation for Analytics:** Acts as the core data engine for `local_competency_report`, `block_competency_report`, and `quizaccess_failgrade`.
+- **Automated Tag-Based Mapping:** Automatically links questions to competencies using Moodle's native tag event observers — no manual intervention needed after import.
+- **External API:** Exposes a secure web service (`save_question_competency`) for programmatic mapping, protected by `moodle/course:manageactivities`.
+- **Localization Support:** English and Turkish language packs included.
+- **Backup & Restore:** Mapping data is preserved when migrating courses.
 
 ---
 
@@ -28,102 +28,113 @@ By mapping questions to learning outcomes, educators can measure exactly which s
 
 | Dependency | Required Version / Compatibility |
 | :--- | :--- |
-| **Moodle Framework** | Moodle 4.5 to 5.0+ (Tested against Moodle 4.5/5.0+ stable branches) |
+| **Moodle Framework** | Moodle 4.5 to 5.0+ |
 | **PHP Runtime** | PHP 8.1, PHP 8.2, PHP 8.3 |
 | **Database System** | PostgreSQL 13+, MySQL 8.0+, or MariaDB 10.5+ |
+
+> **Note:** `local_competency_report` and `quizaccess_failgrade` both declare `qbank_competency` as a required dependency. Install this plugin first.
 
 ---
 
 ## 🚀 Installation
 
-Follow these steps to install the plugin manually:
-
 1. **Download & Extract:** Download the repository and extract the files.
-2. **Directory Placement:** Copy the `competency` folder into your Moodle installation's question bank plugins directory:
-   ```bash
+2. **Directory Placement:** Copy the `competency` folder into your Moodle question bank plugins directory:
+   ```
    moodle/question/bank/competency
    ```
-   *Note: Ensure the folder is named exactly `competency` inside `question/bank/`.*
-3. **Run Moodle Upgrade:** Log in to your Moodle site as an Administrator and navigate to **Site administration > Notifications** to trigger the database upgrade and complete the installation.
-4. **Alternative Install:** Alternatively, zip the directory and upload it via **Site administration > Plugins > Install plugins**.
+   > The folder must be named exactly `competency` inside `question/bank/`.
+3. **Run Moodle Upgrade:** Log in as Administrator and navigate to **Site administration > Notifications**.
+4. **Alternative Install:** Zip the directory and upload via **Site administration > Plugins > Install plugins**.
 
 ---
 
 ## 🛠️ Usage & Configuration
 
-Once installed, mapping competencies to questions is simple:
+### Manual Mapping
+1. Go to your **Course > Question Bank**.
+2. For any question, click the **Edit** dropdown and choose **Competencies** (or click the competency icon in the question row).
+3. Select the competency to associate with this question.
+4. Save.
 
-1. Go to your **Course > Question Bank** (or **Site administration > Question Bank**).
-2. For any question in the list, click the **Edit** dropdown and choose **Competencies** (or click the competencies icon next to the question).
-3. Select the competency framework and choose the specific competency (or competencies) associated with this question.
-4. Save the mapping.
-5. **Downstream Reporting:** To generate reports and analyze student performance on these competency-linked questions, ensure you have installed the `local_competency_report` and `block_competency_report` plugins!
+### Automated Tag-Based Mapping (GIFT Import)
+The plugin listens to Moodle's tag events. When a question is tagged with a `comp-` prefix, the mapping is created automatically.
 
----
-
-## 🏷️ Automated Competency Mapping (GIFT Import)
-
-The plugin features a robust, event-driven automated mapping system. You can automatically map imported questions to their corresponding competencies by using standard Moodle GIFT format comment tags.
-
-### How it works:
-1. **Add Tag to GIFT File:** When writing your questions in a GIFT text file, include the competency tag inside a comment line immediately preceding the question (prefixed by `comp-`):
-   ```text
+1. **Add a tag to your GIFT file:**
+   ```
    // [tag:comp-101]
    ::Question Name:: Which database does Moodle support? { =All of them ~Only one }
    ```
-2. **Import Question:** Import the GIFT file into your Moodle course Question Bank.
-3. **Automatic Mapping:** Moodle's native tag engine processes `comp-101`, which triggers `qbank_competency`'s background event observer. The plugin automatically looks up the competency (via `idnumber` or `shortname`) and creates the mapping record inside Moodle without any manual intervention!
-4. **Automatic Cleanup:** If you later remove the `comp-101` tag from the question in Moodle, the plugin's tag-removal observer will clean up and delete the competency mapping automatically.
+2. **Import the GIFT file** into your course Question Bank.
+3. The plugin detects the `comp-101` tag, looks up the competency by `idnumber` or `shortname`, and creates the mapping automatically.
+4. **Removing the tag** later will also remove the mapping automatically.
+
+---
+
+## 🗄️ Database Schema
+
+The plugin creates one table:
+
+| Table | Purpose |
+| :--- | :--- |
+| `qbank_competency_qmap` | Maps a question (`questionid`) to a competency (`competencyid`) within a course (`courseid`) |
+
+**Key fields:** `id`, `courseid`, `questionid`, `competencyid`, `timecreated`
+
+**Indexes:** `course_question_idx` on `(courseid, questionid)` for fast lookups.
 
 ---
 
 ## 💻 Directory Structure
 
-```text
+```
 competency/
-├── classes/                # Autoloaded classes (Question bank column and form UI logic)
-├── db/                     # Database definitions (install.xml, access.php, upgrade.php)
-├── lang/                   # Language localization packs
-│   ├── en/                 # English translations
-│   └── tr/                 # Turkish translations
 ├── amd/                    # AMD JavaScript modules for UI interactivity
-├── version.php             # Moodle plugin version and dependency definition
-└── README.md               # Professional documentation
+├── classes/
+│   ├── column/             # Question bank column definition
+│   ├── external/           # Web service: save_question_competency
+│   ├── privacy/            # GDPR Privacy provider
+│   ├── observer.php        # Tag event observers (auto-mapping)
+│   └── plugin_feature.php  # Registers the question bank column
+├── db/
+│   ├── install.xml         # Database schema
+│   ├── access.php          # Capability definitions
+│   └── services.php        # Web service definitions
+├── lang/
+│   └── en/                 # English language strings
+├── version.php             # Plugin version and metadata
+└── README.md
 ```
 
 ---
 
 ## 🔗 The Competency Ecosystem
 
-This plugin is part of a complete 3-tier Moodle competency-based education suite:
+This plugin is the data foundation of a 4-plugin competency-based education suite:
 
 ```mermaid
 graph TD
-    A[qbank_competency] -->|1. Links Questions to Competencies| B[local_competency_report]
-    B -->|2. Analyzes Student Answers & Exports Reports| C[block_competency_report]
-    C -->|3. Displays Student Competency Badges on Dashboard| D[Moodle Dashboard]
+    A[qbank_competency] -->|Maps questions to competencies| B[local_competency_report]
+    B -->|Analyses attempts & generates reports| C[block_competency_report]
+    C -->|Shows progress on dashboard| D[Moodle Dashboard / Course]
+    B -->|Provides threshold config| E[quizaccess_failgrade]
+    A -->|Provides question-competency data| E
 ```
-
-1. **`qbank_competency`** *(This Plugin)*: Maps questions to specific skills/competencies in the question bank.
-2. **`local_competency_report`**: Tracks quiz attempts, analyzes answers to mapped questions, calculates competency mastery percentages, and exports premium PDF reports.
-3. **`block_competency_report`**: Renders an interactive overview block directly on the student’s dashboard to showcase their competency achievements across all courses.
 
 ---
 
 ## 🔒 Security & Code Compliance
 
-This plugin has been audited and hardened according to Moodle's strict security and quality guidelines:
-
-- **CSRF Protection:** Standard Moodle session key verification (`require_sesskey()`) is enforced on all state-mutating actions (such as queueing calculations).
-- **SQL Injection Prevention:** Every query utilizes Moodle's Database API (`$DB`) with parameter bindings and named placeholders (`:named`), completely avoiding raw SQL interpolation and protecting against injection attacks.
-- **Input Sanitization:** Direct superglobals (`$_GET`, `$_POST`, `$_REQUEST`) are strictly forbidden. Input retrieval uses standard Moodle validation helpers like `required_param()` and `optional_param()` with strict parameter type filters (`PARAM_INT`, `PARAM_BOOL`, etc.).
-- **Capability Controls:** Page entry points verify course contexts with `require_login()` and validate explicit capabilities (e.g. `mod/quiz:viewreports`, `local_competency_report:viewreports`) via `require_capability()`.
-- **Frankenstyle & Namespace Compliance:** Database tables and autoloaded classes are strictly prefixed and namespaced (e.g. `\local_competency_report\...` or `\quizaccess_failgrade\...`) preventing any class name or table name collisions.
-- **Coding Standards:** Code is audited via `PHP_CodeSniffer` (PHPCS) enforcing clean syntax, proper DocBlocks, and standard Moodle conventions.
+- **SQL Injection Prevention:** All queries use Moodle's `$DB` API with named parameter bindings.
+- **Input Sanitization:** All input retrieved via `required_param()` / `optional_param()` with strict type filters.
+- **Capability Controls:** External API enforces `moodle/course:manageactivities` before any write operation.
+- **Namespace Compliance:** All classes under `\qbank_competency\` namespace.
+- **Coding Standards:** Compliant with Moodle's `PHP_CodeSniffer` (PHPCS) ruleset.
 
 ---
 
 ## 📄 License & Credits
 
 - **Copyright:** © 2026 Mahmoud Salem
-- **License:** Licensed under the [GNU GPL v3 License](http://www.gnu.org/copyleft/gpl.html) (or later).
+- **Based on work by:** 2026 Hakan Çiğci
+- **License:** [GNU GPL v3](http://www.gnu.org/copyleft/gpl.html) or later.
