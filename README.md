@@ -4,7 +4,7 @@
 [![PHP Version](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-blue.svg?style=flat-square)](https://php.net)
 [![Database](https://img.shields.io/badge/Database-PostgreSQL%20%7C%20MySQL%20%7C%20MariaDB-purple.svg?style=flat-square)](https://docs.moodle.org)
 [![License](https://img.shields.io/badge/License-GPL%20v3-green.svg?style=flat-square)](http://www.gnu.org/copyleft/gpl.html)
-[![Version](https://img.shields.io/badge/Version-v2.0.9-blue.svg?style=flat-square)](https://github.com)
+[![Version](https://img.shields.io/badge/Version-v2.1.0-blue.svg?style=flat-square)](https://github.com)
 
 A professional Moodle Question Bank plugin that allows course creators and teachers to link individual questions to specific Moodle competencies. This forms the data foundation of a competency-based assessment and learning analytics system.
 
@@ -120,6 +120,14 @@ graph TD
     B -->|Provides threshold config| E[quizaccess_failgrade]
     A -->|Provides question-competency data| E
 ```
+
+---
+
+## 📋 Changelog
+
+### v2.1.0 — 2026-05-25
+- **Ecosystem Sync:** Synchronized versioning and compatibility standards across the entire Moodle Competency Education Suite (v2026052500) to support advanced Local LLM analytics and brute-force quiz security upgrades.
+- **Verification:** Full verification of all question-competency mappings against the latest Moodle 4.5+ and 5.0+ releases.
 
 ---
 
