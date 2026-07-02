@@ -46,7 +46,6 @@ use core_external\external_multiple_structure;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class save_question_competency extends external_api {
-
     /**
      * Parameter definitions for the execute method.
      *

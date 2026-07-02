@@ -40,7 +40,6 @@ use stdClass;
  * @author     Mahmoud Salem
  */
 class competency_column extends column_base {
-
     /** @var array|null $competencyoptions Store available competencies for the course. */
     protected $competencyoptions = null;
 
@@ -141,7 +140,7 @@ class competency_column extends column_base {
         // Enhance with autocomplete token UI.
         $PAGE->requires->js_call_amd('core/form-autocomplete', 'enhance', [
             '#' . $elementid,
-            true,  // tags = true to allow token display
+            true, // Tags = true to allow token display.
             '',
             get_string('search'),
             false,
