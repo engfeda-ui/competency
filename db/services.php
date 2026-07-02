@@ -19,7 +19,7 @@
  *
  * @package    qbank_competency
  * @copyright  2026 Mahmoud Salem
- * @copyright  based on work by 2026 Hakan Ã‡iÄŸci {@link https://hakancigci.com.tr}
+ * @copyright  based on work by 2026 Hakan Çiğci {@link https://hakancigci.com.tr}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,7 +29,7 @@ $functions = [
     'qbank_competency_save_question_competency' => [
         'classname'   => 'qbank_competency\external\save_question_competency',
         'methodname'  => 'execute',
-        'description' => 'The question records competency.',
+        'description' => 'Save one or more competency mappings for a question (multi-competency support).',
         'type'        => 'write',
         'ajax'        => true,
     ],

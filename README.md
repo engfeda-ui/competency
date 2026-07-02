@@ -4,7 +4,7 @@
 [![PHP Version](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-blue.svg?style=flat-square)](https://php.net)
 [![Database](https://img.shields.io/badge/Database-PostgreSQL%20%7C%20MySQL%20%7C%20MariaDB-purple.svg?style=flat-square)](https://docs.moodle.org)
 [![License](https://img.shields.io/badge/License-GPL%20v3-green.svg?style=flat-square)](http://www.gnu.org/copyleft/gpl.html)
-[![Version](https://img.shields.io/badge/Version-v2.1.0-blue.svg?style=flat-square)](https://github.com/engfeda-ui/competency)
+[![Version](https://img.shields.io/badge/Version-v2.2.0-blue.svg?style=flat-square)](https://github.com/engfeda-ui/competency)
 
 A professional Moodle Question Bank plugin that allows course creators and teachers to link individual questions to specific Moodle competencies. This forms the data foundation of a competency-based assessment and learning analytics system.
 
@@ -14,7 +14,7 @@ By mapping questions to learning outcomes, educators can measure exactly which s
 
 ## ✨ Features
 
-- **Direct Question-to-Competency Mapping:** Link any question in the Moodle Question Bank to a Moodle competency via a dedicated column in the question bank UI.
+- **Direct Question-to-Competency Mapping:** Link any question in the Moodle Question Bank to one or multiple Moodle competencies via a dedicated column in the question bank UI.
 - **Native Moodle Core Competency Integration:** Fully integrated with Moodle's official competency framework (`\core_competency\api`).
 - **Data Foundation for Analytics:** Acts as the core data engine for `local_competency_report`, `block_competency_report`, and `quizaccess_failgrade`.
 - **Automated Tag-Based Mapping:** Automatically links questions to competencies using Moodle's native tag event observers — no manual intervention needed after import.
@@ -58,15 +58,15 @@ By mapping questions to learning outcomes, educators can measure exactly which s
 4. Save.
 
 ### Automated Tag-Based Mapping (GIFT Import)
-The plugin listens to Moodle's tag events. When a question is tagged with a `comp-` prefix, the mapping is created automatically.
+The plugin listens to Moodle's tag events. When a question is tagged with a `comp-` prefix, the mapping is created automatically. Multiple competencies are supported!
 
 1. **Add a tag to your GIFT file:**
    ```
-   // [tag:comp-101]
+   // [tag:comp-101, comp-102]
    ::Question Name:: Which database does Moodle support? { =All of them ~Only one }
    ```
 2. **Import the GIFT file** into your course Question Bank.
-3. The plugin detects the `comp-101` tag, looks up the competency by `idnumber` or `shortname`, and creates the mapping automatically.
+3. The plugin detects the `comp-101` and `comp-102` tags, looks up the competencies by `idnumber` or `shortname`, and creates the mappings automatically.
 4. **Removing the tag** later will also remove the mapping automatically.
 
 ---
@@ -124,6 +124,11 @@ graph TD
 ---
 
 ## 📋 Changelog
+
+### v2.2.0 — 2026-07-03
+- **New:** Multi-Competency Support! You can now map a single question to multiple competencies.
+- **Improvement:** The Question Bank column UI now uses a multi-select autocomplete widget to handle multiple competencies easily.
+- **Improvement:** GIFT format imports and tag events now correctly map multiple competencies from a single question (e.g., `[tag:comp-A, comp-B]`).
 
 ### v2.1.0 — 2026-05-25
 - **Ecosystem Sync:** Synchronized versioning and compatibility standards across the entire Moodle Competency Education Suite (v2026052500) to support advanced Local LLM analytics and brute-force quiz security upgrades.

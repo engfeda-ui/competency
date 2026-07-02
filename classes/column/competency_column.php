@@ -17,9 +17,13 @@
 /**
  * Competency column for Question Bank.
  *
+ * Supports multi-competency: a single question can be mapped to multiple
+ * competencies within the same course. A token-style multi-select widget
+ * (driven by core/form-autocomplete) is rendered per question row.
+ *
  * @package    qbank_competency
  * @copyright  2026 Mahmoud Salem
- * @copyright  based on work by 2026 Hakan Ã‡iÄŸci {@link https://hakancigci.com.tr}
+ * @copyright  based on work by 2026 Hakan Çiğci {@link https://hakancigci.com.tr}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,13 +34,14 @@ use html_writer;
 use stdClass;
 
 /**
- * Competency column for Question Bank.
+ * Competency column for Question Bank — multi-competency aware.
  *
  * @package    qbank_competency
- * @author     Hakan Ã‡iÄŸci
+ * @author     Mahmoud Salem
  */
 class competency_column extends column_base {
-    /** @var array $competencyoptions Store available competencies for the course. */
+
+    /** @var array|null $competencyoptions Store available competencies for the course. */
     protected $competencyoptions = null;
 
     /**
@@ -71,16 +76,20 @@ class competency_column extends column_base {
     /**
      * Display the content of the column.
      *
+     * Renders a multi-select (tokens) widget that shows all competencies
+     * currently mapped to the question and allows adding/removing mappings.
+     *
      * @param stdClass $question The question object.
-     * @param string $rowclasses CSS classes for the row.
+     * @param string   $rowclasses CSS classes for the row.
      * @return void
      */
     protected function display_content($question, $rowclasses): void {
         global $DB, $PAGE;
 
-        $courseid = $this->qbank->id ?? $this->qbank->course->id ?? $PAGE->course->id;
+        $courseid   = $this->qbank->id ?? $this->qbank->course->id ?? $PAGE->course->id;
         $questionid = $question->id;
 
+        // Lazy-load competency list for this course.
         if ($this->competencyoptions === null) {
             $this->competencyoptions = $DB->get_records_sql_menu("
                 SELECT c.id, c.shortname
@@ -96,24 +105,43 @@ class competency_column extends column_base {
             return;
         }
 
-        $current = $DB->get_field('qbank_competency_qmap', 'competencyid', [
+        // Fetch ALL current mappings for this question in this course.
+        $currentmappings = $DB->get_records('qbank_competency_qmap', [
             'courseid'   => $courseid,
             'questionid' => $questionid,
-        ]);
+        ], '', 'competencyid');
 
-        $elementid = 'competency_' . $questionid;
-        $options = [0 => 'â€”'] + $this->competencyoptions;
+        // Build array of selected competency IDs.
+        $selectedids = array_keys($currentmappings);
 
-        echo html_writer::select($options, $elementid, $current, false, [
-            'id'              => $elementid,
-            'class'           => 'competency-select custom-select',
-            'data-questionid' => $questionid,
-            'data-courseid'   => $courseid,
-        ]);
+        // Render a <select multiple> element.
+        // core/form-autocomplete will enhance it into a token/tag widget.
+        $elementid = 'competency_multi_' . $questionid;
 
+        $options = '';
+        foreach ($this->competencyoptions as $compid => $shortname) {
+            $selected = in_array($compid, $selectedids) ? ' selected' : '';
+            $options .= html_writer::tag('option', htmlspecialchars($shortname), [
+                'value' => $compid,
+            ] + ($selected ? ['selected' => 'selected'] : []));
+        }
+
+        $attrs = [
+            'id'               => $elementid,
+            'name'             => $elementid . '[]',
+            'multiple'         => 'multiple',
+            'class'            => 'competency-multiselect',
+            'data-questionid'  => $questionid,
+            'data-courseid'    => $courseid,
+            'style'            => 'min-width:180px',
+        ];
+
+        echo html_writer::tag('select', $options, $attrs);
+
+        // Enhance with autocomplete token UI.
         $PAGE->requires->js_call_amd('core/form-autocomplete', 'enhance', [
             '#' . $elementid,
-            false,
+            true,  // tags = true to allow token display
             '',
             get_string('search'),
             false,

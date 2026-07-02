@@ -77,21 +77,19 @@ class observer {
             return;
         }
 
-        // Add or update the mapping record.
+        // Add the mapping only if it does not already exist for this
+        // exact (question, course, competency) combination.
+        // This supports multi-competency: adding comp-A and comp-B as
+        // separate tags will create TWO rows in qbank_competency_qmap.
         $table = 'qbank_competency_qmap';
-        $conditions = [
-            'questionid' => $taginstance->itemid,
-            'courseid'   => $courseid,
-        ];
-        $record = $DB->get_record($table, $conditions);
+        $exists = $DB->record_exists($table, [
+            'questionid'   => $taginstance->itemid,
+            'courseid'     => $courseid,
+            'competencyid' => $competency->id,
+        ]);
 
-        if ($record) {
-            if ($record->competencyid != $competency->id) {
-                $record->competencyid = $competency->id;
-                $DB->update_record($table, $record);
-            }
-        } else {
-            $newrecord = new stdClass();
+        if (!$exists) {
+            $newrecord               = new stdClass();
             $newrecord->questionid   = $taginstance->itemid;
             $newrecord->competencyid = $competency->id;
             $newrecord->courseid     = $courseid;
