@@ -85,7 +85,7 @@ class competency_column extends column_base {
     protected function display_content($question, $rowclasses): void {
         global $DB, $PAGE;
 
-        $courseid   = $this->qbank->id ?? $this->qbank->course->id ?? $PAGE->course->id;
+        $courseid   = $this->qbank->course->id ?? $PAGE->course->id;
         $questionid = $question->id;
 
         // Lazy-load competency list for this course.

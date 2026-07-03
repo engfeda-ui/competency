@@ -149,29 +149,25 @@ class observer {
 
     /**
      * Resolve the course ID from a given context ID.
+     * Returns 0 if the context cannot be mapped to a real course.
+     *
+     * NOTE: Does NOT fall back to $COURSE global or optional_param() — both are
+     * unsafe in event handlers that may run from CLI/cron with no HTTP request.
      *
      * @param int $contextid The context ID.
      * @return int The course ID, or 0 if not found.
      */
     protected static function resolve_course_id($contextid) {
-        $courseid = 0;
         $context = \context::instance_by_id($contextid, IGNORE_MISSING);
-        if ($context) {
-            $coursecontext = $context->get_course_context(false);
-            if ($coursecontext) {
-                $courseid = $coursecontext->instanceid;
-            }
+        if (!$context) {
+            return 0;
         }
 
-        if ($courseid <= 1) {
-            global $COURSE;
-            if (isset($COURSE) && isset($COURSE->id) && $COURSE->id > 1) {
-                $courseid = $COURSE->id;
-            } else {
-                $courseid = optional_param('courseid', 0, PARAM_INT);
-            }
+        $coursecontext = $context->get_course_context(false);
+        if (!$coursecontext || $coursecontext->instanceid <= 1) {
+            return 0;
         }
 
-        return $courseid;
+        return (int)$coursecontext->instanceid;
     }
 }
