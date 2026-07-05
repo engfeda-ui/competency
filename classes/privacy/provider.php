@@ -28,7 +28,6 @@ namespace qbank_competency\privacy;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\contextlist;
-use core_privacy\local\request\context;
 
 /**
  * Privacy Provider for qbank_competency plugin.
@@ -77,9 +76,9 @@ class provider implements
     /**
      * Delete all data for all users in the specified context.
      *
-     * @param context $context The specific context to delete data for.
+     * @param \context $context The specific context to delete data for.
      */
-    public static function delete_data_for_all_users_in_context(context $context) {
+    public static function delete_data_for_all_users_in_context(\context $context) {
         // Implementation for deleting data for all users in context follows here.
     }
 
