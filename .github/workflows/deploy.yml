@@ -26,4 +26,4 @@ jobs:
 
       - name: Deploy via rsync
         run: |
-          rsync -avz --delete --exclude '.git*' ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/ubuntu/moodle-project/question/bank/competency/
+          rsync -avz --no-perms --no-owner --no-group --delete --exclude '.git*' ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/ubuntu/moodle-project/question/bank/competency/
