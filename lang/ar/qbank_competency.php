@@ -18,7 +18,7 @@
  * Arabic language strings for qbank_competency.
  *
  * @package   qbank_competency
- * @copyright 2026 Mahmoud Salem <m.salem@ewa.bh>
+ * @copyright 2026 Mahmoud Salem <eng.feda@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
