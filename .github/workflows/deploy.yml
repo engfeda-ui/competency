@@ -1,29 +1,42 @@
-name: Deploy to Server
+name: Deploy to Moodle Staging
 
 on:
   push:
-    branches:
-      - master
+    branches: [main, master]
+
+env:
+  PLUGIN_PATH: question/bank/competency
 
 jobs:
   deploy:
+    name: 🚀 Deploy competency qbank → Staging
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install SSH Key
-        uses: shimataro/ssh-key-action@v2
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
         with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts: unnecessary
-          if_key_exists: replace
+          ssh-private-key: ${{ secrets.STAGING_SSH_KEY }}
 
-      - name: Add Host to Known Hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+      - name: Add staging to known_hosts
+        run: ssh-keyscan -H 80.225.79.61 >> ~/.ssh/known_hosts
 
-      - name: Deploy via rsync
+      - name: Deploy plugin files
         run: |
-          rsync -avz --no-perms --no-owner --no-group --delete --exclude '.git*' ./ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/home/ubuntu/moodle-project/question/bank/competency/
+          rsync -avz --delete \
+            --exclude='.git' \
+            --exclude='.github' \
+            ./ ubuntu@80.225.79.61:/home/ubuntu/moodle-staging/${{ env.PLUGIN_PATH }}/
+
+      - name: Upgrade Moodle & clear caches
+        run: |
+          ssh ubuntu@80.225.79.61 "
+            docker exec moodle-staging-app \
+              php /var/www/html/admin/cli/upgrade.php --non-interactive 2>&1 | tail -3
+            docker exec moodle-staging-app \
+              php /var/www/html/admin/cli/purge_caches.php
+            echo '✅ competency qbank deployed to staging!'
+          "
