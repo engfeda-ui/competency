@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="question/bank/competency/db" VERSION="2026031240" COMMENT="XMLDB file for qbank_comp_ext plugin">
+<XMLDB PATH="question/bank/comp_ext/db" VERSION="2026031240" COMMENT="XMLDB file for qbank_comp_ext plugin">
     <TABLES>
         <TABLE NAME="qbank_comp_ext_qmap" COMMENT="Table for mapping questions to specific competencies">
             <FIELDS>
