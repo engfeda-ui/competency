@@ -37,7 +37,7 @@ jobs:
     steps:
       - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
-          path: question/bank/competency
+          path: question/bank/comp_ext
 
       - name: Setup PHP
         uses: shivammathur/setup-php@9e72090525849c5e82e596468b86eb55e9cc5401 # v2.32.0
@@ -59,15 +59,15 @@ jobs:
           echo "$(cd ci/vendor/bin; pwd)" >> $GITHUB_PATH
 
       - name: Install Moodle
-        run: moodle-plugin-ci install --plugin question/bank/competency --db-host=127.0.0.1 --db-user=postgres --db-name=moodle_ci_db --db-pass="" --db-type=pgsql
+        run: moodle-plugin-ci install --plugin question/bank/comp_ext --db-host=127.0.0.1 --db-user=postgres --db-name=moodle_ci_db --db-pass="" --db-type=pgsql
         env:
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
 
       - name: PHP Lint
-        run: moodle-plugin-ci phplint question/bank/competency
+        run: moodle-plugin-ci phplint question/bank/comp_ext
 
       - name: PHP CodeSniffer
-        run: moodle-plugin-ci codechecker question/bank/competency
+        run: moodle-plugin-ci codechecker question/bank/comp_ext
 
       - name: Moodle PHPUnit
         run: moodle-plugin-ci phpunit
