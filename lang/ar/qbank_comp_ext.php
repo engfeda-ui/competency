@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Arabic language strings for qbank_competency.
+ * Arabic language strings for qbank_comp_ext.
  *
- * @package   qbank_competency
+ * @package   qbank_comp_ext
  * @copyright 2026 Mahmoud Salem <eng.feda@gmail.com>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

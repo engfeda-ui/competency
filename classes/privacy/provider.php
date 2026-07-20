@@ -17,22 +17,22 @@
 /**
  * Question bank plugin features definition.
  *
- * @package    qbank_competency
+ * @package    qbank_comp_ext
  * @copyright  2026 Mahmoud Salem
  * @copyright  based on work by 2026 Hakan Ã‡iÄŸci {@link https://hakancigci.com.tr}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace qbank_competency\privacy;
+namespace qbank_comp_ext\privacy;
 
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\contextlist;
 
 /**
- * Privacy Provider for qbank_competency plugin.
+ * Privacy Provider for qbank_comp_ext plugin.
  *
- * @package    qbank_competency
+ * @package    qbank_comp_ext
  * @copyright  2026 Hakan Ã‡iÄŸci
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -46,7 +46,7 @@ class provider implements
      * @return collection The updated set of items.
      */
     public static function get_metadata(collection $items): collection {
-        // The qbank_competency_qmap table stores question-to-competency mappings.
+        // The qbank_comp_ext_qmap table stores question-to-competency mappings.
         // It does NOT store personal user data — mappings are created by teachers,
         // not by students. The table has no userid or contextid column.
         // No personal data is stored by this plugin.

@@ -21,13 +21,13 @@
  * competencies within the same course. A token-style multi-select widget
  * (driven by core/form-autocomplete) is rendered per question row.
  *
- * @package    qbank_competency
+ * @package    qbank_comp_ext
  * @copyright  2026 Mahmoud Salem
  * @copyright  based on work by 2026 Hakan Çiğci {@link https://hakancigci.com.tr}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace qbank_competency\column;
+namespace qbank_comp_ext\column;
 
 use core_question\local\bank\column_base;
 use html_writer;
@@ -36,7 +36,7 @@ use stdClass;
 /**
  * Competency column for Question Bank — multi-competency aware.
  *
- * @package    qbank_competency
+ * @package    qbank_comp_ext
  * @author     Mahmoud Salem
  */
 class competency_column extends column_base {
@@ -51,7 +51,7 @@ class competency_column extends column_base {
     public function init(): void {
         parent::init();
         global $PAGE;
-        $PAGE->requires->js_call_amd('qbank_competency/mapping', 'init');
+        $PAGE->requires->js_call_amd('qbank_comp_ext/mapping', 'init');
     }
 
     /**
@@ -69,7 +69,7 @@ class competency_column extends column_base {
      * @return string
      */
     public function get_title(): string {
-        return get_string('competency', 'qbank_competency');
+        return get_string('competency', 'qbank_comp_ext');
     }
 
     /**
@@ -105,7 +105,7 @@ class competency_column extends column_base {
         }
 
         // Fetch ALL current mappings for this question in this course.
-        $currentmappings = $DB->get_records('qbank_competency_qmap', [
+        $currentmappings = $DB->get_records('qbank_comp_ext_qmap', [
             'courseid'   => $courseid,
             'questionid' => $questionid,
         ], '', 'competencyid');
@@ -155,6 +155,6 @@ class competency_column extends column_base {
      * @return array
      */
     public function get_extra_classes(): array {
-        return ['pe-2', 'qbank_competency_column'];
+        return ['pe-2', 'qbank_comp_ext_column'];
     }
 }

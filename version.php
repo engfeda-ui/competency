@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Version details for the qbank_competency plugin.
+ * Version details for the qbank_comp_ext plugin.
  *
- * @package    qbank_competency
+ * @package    qbank_comp_ext
  * @copyright  2026 Mahmoud Salem
  * @copyright  based on work by 2026 Hakan Çiğci {@link https://hakancigci.com.tr}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /** @var stdClass $plugin */
-$plugin->component = 'qbank_competency';    // Full name of the plugin (category_name).
+$plugin->component = 'qbank_comp_ext';    // Full name of the plugin (category_name).
 $plugin->version   = 2026070500;           // The current module version (YYYYMMDDXX).
 $plugin->requires  = 2024042210;           // Requires Moodle 4.5 or later.
 $plugin->maturity  = MATURITY_STABLE;       // Maturity level of the plugin.

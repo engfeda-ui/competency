@@ -20,7 +20,7 @@
  * competency_column) and sends the full selected set of competency IDs to
  * the web service as an array, replacing all existing mappings atomically.
  *
- * @module      qbank_competency/mapping
+ * @module      qbank_comp_ext/mapping
  * @copyright   2026 Mahmoud Salem
  * @copyright   based on work by 2026 Hakan Çiğci {@link https://hakancigci.com.tr}
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -70,7 +70,7 @@ define(['core/ajax', 'core/notification'], function(Ajax, Notification) {
                 const competencyids = getSelectedIds(target);
 
                 Ajax.call([{
-                    methodname: 'qbank_competency_save_question_competency',
+                    methodname: 'qbank_comp_ext_save_question_competency',
                     args: {
                         questionid: questionid,
                         competencyids: competencyids,   // Full array — replaces all existing mappings.

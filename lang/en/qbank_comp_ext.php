@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * English strings for qbank_competency plugin.
+ * English strings for qbank_comp_ext plugin.
  *
- * @package    qbank_competency
+ * @package    qbank_comp_ext
  * @copyright  2026 Mahmoud Salem
  * @copyright  based on work by 2026 Hakan Ã‡iÄŸci {@link https://hakancigci.com.tr}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

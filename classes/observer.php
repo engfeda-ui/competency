@@ -15,21 +15,21 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Event observers for qbank_competency.
+ * Event observers for qbank_comp_ext.
  *
- * @package    qbank_competency
+ * @package    qbank_comp_ext
  * @copyright  2026 Mahmoud Salem
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace qbank_competency;
+namespace qbank_comp_ext;
 
 use stdClass;
 
 /**
  * Event observers for mapping question competencies.
  *
- * @package    qbank_competency
+ * @package    qbank_comp_ext
  * @copyright  2026 Mahmoud Salem
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -80,8 +80,8 @@ class observer {
         // Add the mapping only if it does not already exist for this
         // exact (question, course, competency) combination.
         // This supports multi-competency: adding comp-A and comp-B as
-        // separate tags will create TWO rows in qbank_competency_qmap.
-        $table = 'qbank_competency_qmap';
+        // separate tags will create TWO rows in qbank_comp_ext_qmap.
+        $table = 'qbank_comp_ext_qmap';
         $exists = $DB->record_exists($table, [
             'questionid'   => $taginstance->itemid,
             'courseid'     => $courseid,
@@ -140,7 +140,7 @@ class observer {
             return;
         }
 
-        $DB->delete_records('qbank_competency_qmap', [
+        $DB->delete_records('qbank_comp_ext_qmap', [
             'questionid'   => $taginstance->itemid,
             'courseid'     => $courseid,
             'competencyid' => $competency->id,

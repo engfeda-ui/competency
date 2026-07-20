@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Event observers for the qbank_competency plugin.
+ * Event observers for the qbank_comp_ext plugin.
  *
- * @package    qbank_competency
+ * @package    qbank_comp_ext
  * @copyright  2026 Mahmoud Salem
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -27,12 +27,12 @@ defined('MOODLE_INTERNAL') || die();
 $observers = [
     [
         'eventname'   => '\core\event\tag_added',
-        'callback'    => '\qbank_competency\observer::tag_added',
+        'callback'    => '\qbank_comp_ext\observer::tag_added',
         'internal'    => false,
     ],
     [
         'eventname'   => '\core\event\tag_removed',
-        'callback'    => '\qbank_competency\observer::tag_removed',
+        'callback'    => '\qbank_comp_ext\observer::tag_removed',
         'internal'    => false,
     ],
 ];

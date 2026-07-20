@@ -17,25 +17,25 @@
 /**
  * Question bank plugin features definition.
  *
- * @package    qbank_competency
+ * @package    qbank_comp_ext
  * @copyright  2026 Mahmoud Salem
  * @copyright  based on work by 2026 Hakan Ã‡iÄŸci {@link https://hakancigci.com.tr}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace qbank_competency;
+namespace qbank_comp_ext;
 
 use core_question\local\bank\plugin_features_base;
 use core_question\local\bank\view;
-use qbank_competency\column\competency_column;
+use qbank_comp_ext\column\competency_column;
 
 /**
  * Class plugin_feature
  *
- * This class defines the features provided by the qbank_competency plugin
+ * This class defines the features provided by the qbank_comp_ext plugin
  * to the question bank view.
  *
- * @package    qbank_competency
+ * @package    qbank_comp_ext
  * @author     Hakan Ã‡iÄŸci
  */
 class plugin_feature extends plugin_features_base {

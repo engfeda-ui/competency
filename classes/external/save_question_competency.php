@@ -22,13 +22,13 @@
  * FULL desired set of competency IDs for the question; this method replaces
  * all existing mappings with that set atomically.
  *
- * @package    qbank_competency
+ * @package    qbank_comp_ext
  * @copyright  2026 Mahmoud Salem
  * @copyright  based on work by 2026 Hakan Çiğci {@link https://hakancigci.com.tr}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace qbank_competency\external;
+namespace qbank_comp_ext\external;
 
 use stdClass;
 use context_course;
@@ -40,7 +40,7 @@ use core_external\external_multiple_structure;
 /**
  * External service class for saving question competencies (multi-competency).
  *
- * @package    qbank_competency
+ * @package    qbank_comp_ext
  * @copyright  2026 Mahmoud Salem
  * @copyright  based on work by 2026 Hakan Çiğci {@link https://hakancigci.com.tr}
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -90,7 +90,7 @@ class save_question_competency extends external_api {
         self::validate_context($context);
         require_capability('moodle/course:manageactivities', $context);
 
-        $table = 'qbank_competency_qmap';
+        $table = 'qbank_comp_ext_qmap';
         $now   = time();
 
         // Delete ALL existing mappings for this question+course atomically.

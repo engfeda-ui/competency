@@ -1,4 +1,4 @@
-# 🎓 Moodle Question Bank Plugin: Competency (`qbank_competency`)
+# 🎓 Moodle Question Bank Plugin: Competency (`qbank_comp_ext`)
 
 [![Moodle Compatibility](https://img.shields.io/badge/Moodle-4.5%20%7C%205.0%2B-orange.svg?style=flat-square)](https://moodle.org)
 [![PHP Version](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-blue.svg?style=flat-square)](https://php.net)
@@ -16,7 +16,7 @@ By mapping questions to learning outcomes, educators can measure exactly which s
 
 - **Direct Question-to-Competency Mapping:** Link any question in the Moodle Question Bank to one or multiple Moodle competencies via a dedicated column in the question bank UI.
 - **Native Moodle Core Competency Integration:** Fully integrated with Moodle's official competency framework (`\core_competency\api`).
-- **Data Foundation for Analytics:** Acts as the core data engine for `local_competency_report`, `block_competency_report`, and `quizaccess_failgrade`.
+- **Data Foundation for Analytics:** Acts as the core data engine for `local_comp_report_ext`, `block_comp_report_ext`, and `quizaccess_failgrade_ext`.
 - **Automated Tag-Based Mapping:** Automatically links questions to competencies using Moodle's native tag event observers — no manual intervention needed after import.
 - **External API:** Exposes a secure web service (`save_question_competency`) for programmatic mapping, protected by `moodle/course:manageactivities`.
 - **Localization Support:** English and Turkish language packs included.
@@ -32,7 +32,7 @@ By mapping questions to learning outcomes, educators can measure exactly which s
 | **PHP Runtime** | PHP 8.1, PHP 8.2, PHP 8.3 |
 | **Database System** | PostgreSQL 13+, MySQL 8.0+, or MariaDB 10.5+ |
 
-> **Note:** `local_competency_report` and `quizaccess_failgrade` both declare `qbank_competency` as a required dependency. Install this plugin first.
+> **Note:** `local_comp_report_ext` and `quizaccess_failgrade_ext` both declare `qbank_comp_ext` as a required dependency. Install this plugin first.
 
 ---
 
@@ -41,7 +41,7 @@ By mapping questions to learning outcomes, educators can measure exactly which s
 1. **Download & Extract:** Download the repository and extract the files.
 2. **Directory Placement:** Copy the `competency` folder into your Moodle question bank plugins directory:
    ```
-   moodle/question/bank/competency
+   moodle/question/bank/comp_ext
    ```
    > The folder must be named exactly `competency` inside `question/bank/`.
 3. **Run Moodle Upgrade:** Log in as Administrator and navigate to **Site administration > Notifications**.
@@ -77,7 +77,7 @@ The plugin creates one table:
 
 | Table | Purpose |
 | :--- | :--- |
-| `qbank_competency_qmap` | Maps a question (`questionid`) to a competency (`competencyid`) within a course (`courseid`) |
+| `qbank_comp_ext_qmap` | Maps a question (`questionid`) to a competency (`competencyid`) within a course (`courseid`) |
 
 **Key fields:** `id`, `courseid`, `questionid`, `competencyid`, `timecreated`
 
@@ -114,10 +114,10 @@ This plugin is the data foundation of a 4-plugin competency-based education suit
 
 ```mermaid
 graph TD
-    A[qbank_competency] -->|Maps questions to competencies| B[local_competency_report]
-    B -->|Analyses attempts & generates reports| C[block_competency_report]
+    A[qbank_comp_ext] -->|Maps questions to competencies| B[local_comp_report_ext]
+    B -->|Analyses attempts & generates reports| C[block_comp_report_ext]
     C -->|Shows progress on dashboard| D[Moodle Dashboard / Course]
-    B -->|Provides threshold config| E[quizaccess_failgrade]
+    B -->|Provides threshold config| E[quizaccess_failgrade_ext]
     A -->|Provides question-competency data| E
 ```
 
@@ -144,7 +144,7 @@ graph TD
 - **SQL Injection Prevention:** All queries use Moodle's `$DB` API with named parameter bindings.
 - **Input Sanitization:** All input retrieved via `required_param()` / `optional_param()` with strict type filters.
 - **Capability Controls:** External API enforces `moodle/course:manageactivities` before any write operation.
-- **Namespace Compliance:** All classes under `\qbank_competency\` namespace.
+- **Namespace Compliance:** All classes under `\qbank_comp_ext\` namespace.
 - **Coding Standards:** Compliant with Moodle's `PHP_CodeSniffer` (PHPCS) ruleset.
 
 ---
