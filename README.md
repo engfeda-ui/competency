@@ -125,6 +125,9 @@ graph TD
 
 ## 📋 Changelog
 
+### v2.3.1 — 2026-07-25
+- **Fix:** Enhanced tag auto-sync and case-insensitive competency lookup (`Operation`, `Troubleshooting`, `comp-operation`) for question bank competency column.
+
 ### v2.3.0 — 2026-07-24
 - **Release:** Standardized frankenstyle component name to `qbank_comp_ext` installed under `question/bank/comp_ext`.
 

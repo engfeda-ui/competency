@@ -113,6 +113,42 @@ class competency_column extends column_base {
         // Build array of selected competency IDs.
         $selectedids = array_keys($currentmappings);
 
+        // Auto-sync question tags to competencies if not already mapped in database.
+        $qtags = $DB->get_records_sql("
+            SELECT t.name, t.rawname
+              FROM {tag_instance} ti
+              JOIN {tag} t ON ti.tagid = t.id
+             WHERE ti.itemid = ?
+        ", [$questionid]);
+
+        if (!empty($qtags)) {
+            foreach ($qtags as $qtag) {
+                $tagname   = strtolower($qtag->name);
+                $rawname   = strtolower($qtag->rawname);
+                $cleanname = (strpos($tagname, 'comp-') === 0) ? substr($tagname, 5) : $tagname;
+
+                foreach ($this->competencyoptions as $compid => $shortname) {
+                    $complower = strtolower($shortname);
+                    if ($complower === $tagname || $complower === $rawname || $complower === $cleanname || ('comp-' . $complower) === $tagname) {
+                        if (!in_array($compid, $selectedids)) {
+                            $rec = (object)[
+                                'questionid'   => $questionid,
+                                'courseid'     => $courseid,
+                                'competencyid' => $compid,
+                                'timecreated'  => time(),
+                            ];
+                            try {
+                                $DB->insert_record('qbank_comp_ext_qmap', $rec);
+                                $selectedids[] = $compid;
+                            } catch (\Throwable $e) {
+                                unset($e);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // Render a <select multiple> element.
         // core/form-autocomplete will enhance it into a token/tag widget.
         $elementid = 'competency_multi_' . $questionid;

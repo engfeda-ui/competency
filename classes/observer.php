@@ -60,13 +60,12 @@ class observer {
 
         $competencycode = substr($tagname, 5);
 
-        // Find competency by idnumber or shortname.
-        $competency = $DB->get_record_select('competency', 'idnumber = ? OR idnumber = ? OR shortname = ? OR shortname = ?', [
-            $tagname,
-            $competencycode,
-            $tagname,
-            $competencycode,
-        ], '*', IGNORE_MULTIPLE);
+        // Find competency by idnumber or shortname (case-insensitive).
+        $competency = $DB->get_record_sql("
+            SELECT * FROM {competency}
+             WHERE LOWER(idnumber) = LOWER(?) OR LOWER(idnumber) = LOWER(?)
+                OR LOWER(shortname) = LOWER(?) OR LOWER(shortname) = LOWER(?)
+        ", [$tagname, $competencycode, $tagname, $competencycode]);
 
         if (!$competency) {
             return;
