@@ -4,7 +4,7 @@
 [![PHP Version](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-blue.svg?style=flat-square)](https://php.net)
 [![Database](https://img.shields.io/badge/Database-PostgreSQL%20%7C%20MySQL%20%7C%20MariaDB-purple.svg?style=flat-square)](https://docs.moodle.org)
 [![License](https://img.shields.io/badge/License-GPL%20v3-green.svg?style=flat-square)](http://www.gnu.org/copyleft/gpl.html)
-[![Version](https://img.shields.io/badge/Version-v2.2.1-blue.svg?style=flat-square)](https://github.com/engfeda-ui/competency)
+[![Version](https://img.shields.io/badge/Version-v2.3.0-blue.svg?style=flat-square)](https://github.com/engfeda-ui/competency)
 
 A professional Moodle Question Bank plugin that allows course creators and teachers to link individual questions to specific Moodle competencies. This forms the data foundation of a competency-based assessment and learning analytics system.
 
@@ -124,6 +124,9 @@ graph TD
 ---
 
 ## 📋 Changelog
+
+### v2.3.0 — 2026-07-24
+- **Release:** Standardized frankenstyle component name to `qbank_comp_ext` installed under `question/bank/comp_ext`.
 
 ### v2.2.1 — 2026-07-05
 - **Fix:** Resolved PHP 8.x compatibility issue in the GDPR Privacy Provider (`classes/privacy/provider.php`) caused by importing and type-hinting an invalid `core_privacy` context class instead of the global Moodle `\context` class.
