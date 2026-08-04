@@ -38,10 +38,15 @@
   - `competency` → `/home/ubuntu/moodle-project/question/bank/comp_ext/`
   - `failgrade` → `/home/ubuntu/moodle-project/mod/quiz/accessrule/failgrade_ext/`
   - `attemptpassword` → `/home/ubuntu/moodle-project/mod/quiz/accessrule/attemptpassword/`
-- **Commands:** Stream tar archive over SCP/SSH, extract with `sudo`, and run CLI upgrade + purge caches:
-  ```bash
-  sudo docker exec -u www-data moodle-app php /var/www/html/admin/cli/upgrade.php --non-interactive
-  sudo docker exec -u www-data moodle-app php /var/www/html/admin/cli/purge_caches.php
+- **Full PowerShell Deploy Command (run from PowerShell):**
+  ```powershell
+  $sshKey    = "C:\Users\mahmo\Documents\ssh-key-2026-07-10 (production lms).key"
+  $remote    = "ubuntu@150.230.241.37"
+  $localPath = "c:\Users\mahmo\OneDrive - Energy & Water Academy\Work\Repo\<plugin-folder>"
+  $remotePath = "/home/ubuntu/moodle-project/<plugin-remote-path>/"
+
+  cmd /c "tar -czf - -C `"$localPath`" . | ssh -i `"$sshKey`" -o StrictHostKeyChecking=no $remote `"sudo tar -xzf - -C $remotePath`""
+  ssh -i $sshKey -o StrictHostKeyChecking=no $remote "sudo docker exec -u www-data moodle-app php /var/www/html/admin/cli/upgrade.php --non-interactive && sudo docker exec -u www-data moodle-app php /var/www/html/admin/cli/purge_caches.php"
   ```
 
 ---
@@ -55,8 +60,31 @@
   - `competency` → `/home/ubuntu/moodle-staging/question/bank/comp_ext/`
   - `failgrade` → `/home/ubuntu/moodle-staging/mod/quiz/accessrule/failgrade_ext/`
   - `attemptpassword` → `/home/ubuntu/moodle-staging/mod/quiz/accessrule/attemptpassword/`
-- **Commands:** Stream tar archive over SCP/SSH, extract with `sudo`, and run CLI upgrade + purge caches:
-  ```bash
-  sudo docker exec -u www-data moodle-staging-app php /var/www/html/admin/cli/upgrade.php --non-interactive
-  sudo docker exec -u www-data moodle-staging-app php /var/www/html/admin/cli/purge_caches.php
+- **Full PowerShell Deploy Command (run from PowerShell):**
+  ```powershell
+  $sshKey    = "C:\Users\mahmo\Documents\ssh-key-2026-07-17 (staging + backup).key"
+  $remote    = "ubuntu@80.225.79.61"
+  $localPath = "c:\Users\mahmo\OneDrive - Energy & Water Academy\Work\Repo\<plugin-folder>"
+  $remotePath = "/home/ubuntu/moodle-staging/<plugin-remote-path>/"
+
+  cmd /c "tar -czf - -C `"$localPath`" . | ssh -i `"$sshKey`" -o StrictHostKeyChecking=no $remote `"sudo tar -xzf - -C $remotePath`""
+  ssh -i $sshKey -o StrictHostKeyChecking=no $remote "sudo docker exec -u www-data moodle-staging-app php /var/www/html/admin/cli/upgrade.php --non-interactive && sudo docker exec -u www-data moodle-staging-app php /var/www/html/admin/cli/purge_caches.php"
   ```
+
+---
+
+## 🗂️ Plugin → Path Mapping Reference
+
+| Plugin (local folder) | Production Path | Staging Path |
+|---|---|---|
+| `competency-report` | `/home/ubuntu/moodle-project/local/comp_report_ext/` | `/home/ubuntu/moodle-staging/local/comp_report_ext/` |
+| `block_competency_report` | `/home/ubuntu/moodle-project/blocks/comp_report_ext/` | `/home/ubuntu/moodle-staging/blocks/comp_report_ext/` |
+| `competency` | `/home/ubuntu/moodle-project/question/bank/comp_ext/` | `/home/ubuntu/moodle-staging/question/bank/comp_ext/` |
+| `failgrade` | `/home/ubuntu/moodle-project/mod/quiz/accessrule/failgrade_ext/` | `/home/ubuntu/moodle-staging/mod/quiz/accessrule/failgrade_ext/` |
+| `attemptpassword` | `/home/ubuntu/moodle-project/mod/quiz/accessrule/attemptpassword/` | `/home/ubuntu/moodle-staging/mod/quiz/accessrule/attemptpassword/` |
+
+## 🐳 Docker Container Names
+| Environment | Container Name |
+|---|---|
+| Production | `moodle-app` |
+| Staging | `moodle-staging-app` |
