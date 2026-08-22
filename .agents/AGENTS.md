@@ -1,6 +1,6 @@
-# Mandatory Versioning, Dual-Environment SSH Deployment & Packaging Directive
+# Mandatory Versioning & SSH Deployment Directive
 
-> ⚠️ **STRICT USER DIRECTIVE**: For every single edit, update, bug fix, or feature addition made in any project or plugin in this workspace, you MUST ALWAYS automatically execute the following 5-step workflow without being asked:
+> ⚠️ **STRICT USER DIRECTIVE**: For every single edit, update, bug fix, or feature addition made in any project or plugin in this workspace, you MUST ALWAYS automatically execute the following 4-step workflow without being asked:
 
 ---
 
@@ -10,13 +10,12 @@
 
 ---
 
-## 2. 🔀 Git Push (Master & Staging Branches)
-- Push changes to both branches on GitHub:
+## 2. 🔀 Git Push (Master Branch)
+- Push changes to GitHub:
   ```bash
   git add .
   git commit -m "<type>(<scope>): <version> <description>"
   git push origin master
-  git push origin master:staging
   ```
 
 ---
@@ -51,40 +50,17 @@
 
 ---
 
-## 5. 🧪 Direct SSH Deployment to Staging LMS Server (`80.225.79.61`)
-- **Host:** `ubuntu@80.225.79.61`
-- **SSH Key:** `C:\Users\mahmo\Documents\ssh-key-2026-07-17 (staging + backup).key`
-- **Plugin Paths on Host:**
-  - `competency-report` → `/home/ubuntu/moodle-staging/local/comp_report_ext/`
-  - `block_competency_report` → `/home/ubuntu/moodle-staging/blocks/comp_report_ext/`
-  - `competency` → `/home/ubuntu/moodle-staging/question/bank/comp_ext/`
-  - `failgrade` → `/home/ubuntu/moodle-staging/mod/quiz/accessrule/failgrade_ext/`
-  - `attemptpassword` → `/home/ubuntu/moodle-staging/mod/quiz/accessrule/attemptpassword/`
-- **Full PowerShell Deploy Command (run from PowerShell):**
-  ```powershell
-  $sshKey    = "C:\Users\mahmo\Documents\ssh-key-2026-07-17 (staging + backup).key"
-  $remote    = "ubuntu@80.225.79.61"
-  $localPath = "c:\Users\mahmo\OneDrive - Energy & Water Academy\Work\Repo\<plugin-folder>"
-  $remotePath = "/home/ubuntu/moodle-staging/<plugin-remote-path>/"
-
-  cmd /c "tar -czf - -C `"$localPath`" . | ssh -i `"$sshKey`" -o StrictHostKeyChecking=no $remote `"sudo tar -xzf - -C $remotePath`""
-  ssh -i $sshKey -o StrictHostKeyChecking=no $remote "sudo docker exec -u www-data moodle-staging-app php /var/www/html/admin/cli/upgrade.php --non-interactive && sudo docker exec -u www-data moodle-staging-app php /var/www/html/admin/cli/purge_caches.php"
-  ```
-
----
-
 ## 🗂️ Plugin → Path Mapping Reference
 
-| Plugin (local folder) | Production Path | Staging Path |
-|---|---|---|
-| `competency-report` | `/home/ubuntu/moodle-project/local/comp_report_ext/` | `/home/ubuntu/moodle-staging/local/comp_report_ext/` |
-| `block_competency_report` | `/home/ubuntu/moodle-project/blocks/comp_report_ext/` | `/home/ubuntu/moodle-staging/blocks/comp_report_ext/` |
-| `competency` | `/home/ubuntu/moodle-project/question/bank/comp_ext/` | `/home/ubuntu/moodle-staging/question/bank/comp_ext/` |
-| `failgrade` | `/home/ubuntu/moodle-project/mod/quiz/accessrule/failgrade_ext/` | `/home/ubuntu/moodle-staging/mod/quiz/accessrule/failgrade_ext/` |
-| `attemptpassword` | `/home/ubuntu/moodle-project/mod/quiz/accessrule/attemptpassword/` | `/home/ubuntu/moodle-staging/mod/quiz/accessrule/attemptpassword/` |
+| Plugin (local folder) | Production Path |
+|---|---|
+| `competency-report` | `/home/ubuntu/moodle-project/local/comp_report_ext/` |
+| `block_competency_report` | `/home/ubuntu/moodle-project/blocks/comp_report_ext/` |
+| `competency` | `/home/ubuntu/moodle-project/question/bank/comp_ext/` |
+| `failgrade` | `/home/ubuntu/moodle-project/mod/quiz/accessrule/failgrade_ext/` |
+| `attemptpassword` | `/home/ubuntu/moodle-project/mod/quiz/accessrule/attemptpassword/` |
 
-## 🐳 Docker Container Names
+## 🐳 Docker Container Name
 | Environment | Container Name |
 |---|---|
 | Production | `moodle-app` |
-| Staging | `moodle-staging-app` |
