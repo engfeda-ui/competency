@@ -4,7 +4,7 @@
 [![PHP Version](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-blue.svg?style=flat-square)](https://php.net)
 [![Database](https://img.shields.io/badge/Database-PostgreSQL%20%7C%20MySQL%20%7C%20MariaDB-purple.svg?style=flat-square)](https://docs.moodle.org)
 [![License](https://img.shields.io/badge/License-GPL%20v3-green.svg?style=flat-square)](http://www.gnu.org/copyleft/gpl.html)
-[![Version](https://img.shields.io/badge/Version-v2.3.4-blue.svg?style=flat-square)](https://github.com/engfeda-ui/competency)
+[![Version](https://img.shields.io/badge/Version-v2.3.5-blue.svg?style=flat-square)](https://github.com/engfeda-ui/competency)
 
 A professional Moodle Question Bank plugin that allows course creators and teachers to link individual questions to specific Moodle competencies. This forms the data foundation of a competency-based assessment and learning analytics system.
 
@@ -19,7 +19,7 @@ By mapping questions to learning outcomes, educators can measure exactly which s
 - **Data Foundation for Analytics:** Acts as the core data engine for `local_comp_report_ext`, `block_comp_report_ext`, and `quizaccess_failgrade_ext`.
 - **Automated Tag-Based Mapping:** Automatically links questions to competencies using Moodle's native tag event observers — no manual intervention needed after import.
 - **External API:** Exposes a secure web service (`save_question_competency`) for programmatic mapping, protected by `moodle/course:manageactivities`.
-- **Localization Support:** English and Turkish language packs included.
+- **Localization Support:** English, Arabic (`ar`), and Turkish (`tr`) language packs included.
 - **Backup & Restore:** Mapping data is preserved when migrating courses.
 
 ---
@@ -43,9 +43,9 @@ By mapping questions to learning outcomes, educators can measure exactly which s
    ```
    moodle/question/bank/comp_ext
    ```
-   > The folder must be named exactly `competency` inside `question/bank/`.
-3. **Run Moodle Upgrade:** Log in as Administrator and navigate to **Site administration > Notifications**.
-4. **Alternative Install:** Zip the directory and upload via **Site administration > Plugins > Install plugins**.
+   > The directory name inside `question/bank/` must be exactly `comp_ext`.
+4. **Run Moodle Upgrade:** Log in as Administrator and navigate to **Site administration > Notifications**.
+5. **Alternative Install:** Zip the directory and upload via **Site administration > Plugins > Install plugins**.
 
 ---
 
@@ -124,6 +124,9 @@ graph TD
 ---
 
 ## 📋 Changelog
+
+### v2.3.5 — 2026-08-24
+- **Documentation:** Corrected installation directory path note to `comp_ext` and documented Arabic language pack support.
 
 ### v2.3.4 — 2026-08-24
 - **CI/CD:** Streamlined deployment pipeline directly to Production environment and removed deprecated staging branch/configuration.
