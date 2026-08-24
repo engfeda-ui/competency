@@ -1,10 +1,9 @@
-name: Deploy Moodle Plugin (Dual Environment)
+name: Deploy Moodle Plugin to Production
 
 on:
   push:
     branches:
       - master
-      - staging
 
 env:
   PLUGIN_PATH: question/bank/comp_ext
@@ -18,48 +17,33 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # ── 1. تحديد السيرفر المستهدف ديناميكياً ──────────────────────
-      - name: Set Target Environment
-        id: target
-        run: |
-          if [ "${{ github.ref_name }}" = "staging" ]; then
-            echo "host=${{ secrets.STAGING_SSH_HOST || '80.225.79.61' }}" >> $GITHUB_OUTPUT
-            echo "dir=/home/ubuntu/moodle-staging/${{ env.PLUGIN_PATH }}" >> $GITHUB_OUTPUT
-            echo "container=moodle-staging-app"                           >> $GITHUB_OUTPUT
-            echo "key=${{ secrets.STAGING_SSH_KEY }}"                     >> $GITHUB_OUTPUT
-            echo "env=🧪 STAGING"                                         >> $GITHUB_OUTPUT
-          else
-            echo "host=${{ secrets.SSH_HOST }}"                           >> $GITHUB_OUTPUT
-            echo "dir=/home/ubuntu/moodle-project/${{ env.PLUGIN_PATH }}" >> $GITHUB_OUTPUT
-            echo "container=moodle-app"                                   >> $GITHUB_OUTPUT
-            echo "key=${{ secrets.SSH_PRIVATE_KEY }}"                     >> $GITHUB_OUTPUT
-            echo "env=🚀 PRODUCTION"                                      >> $GITHUB_OUTPUT
-          fi
-
-      # ── 2. إعداد مفتاح الـ SSH ─────────────────────────────────
+      # ── 1. إعداد مفتاح الـ SSH ─────────────────────────────────
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: ${{ steps.target.outputs.key }}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Add Host to Known Hosts
-        run: ssh-keyscan -H ${{ steps.target.outputs.host }} >> ~/.ssh/known_hosts
+        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      # ── 3. نقل الملفات باستخدام rsync ──────────────────────────
+      # ── 2. نقل الملفات باستخدام rsync ──────────────────────────
       - name: Deploy plugin files
         run: |
           rsync -avz --delete \
             --exclude='.git' \
             --exclude='.github' \
-            ./ ubuntu@${{ steps.target.outputs.host }}:${{ steps.target.outputs.dir }}/
+            --exclude='.gitignore' \
+            --exclude='.gitattributes' \
+            --exclude='.agents' \
+            ./ ubuntu@${{ secrets.SSH_HOST }}:/home/ubuntu/moodle-project/${{ env.PLUGIN_PATH }}/
 
-      # ── 4. ترقية المودل ومسح الكاش داخل الحاوية بصلاحيات الويب ──
+      # ── 3. ترقية المودل ومسح الكاش داخل الحاوية بصلاحيات الويب ──
       - name: Upgrade Moodle & Clear Caches
         run: |
-          ssh ubuntu@${{ steps.target.outputs.host }} "
-            docker exec -u www-data ${{ steps.target.outputs.container }} \
+          ssh ubuntu@${{ secrets.SSH_HOST }} "
+            docker exec -u www-data moodle-app \
               php /var/www/html/admin/cli/upgrade.php --non-interactive 2>&1 | tail -3
-            docker exec -u www-data ${{ steps.target.outputs.container }} \
+            docker exec -u www-data moodle-app \
               php /var/www/html/admin/cli/purge_caches.php
-            echo '✅ ${{ env.PLUGIN_PATH }} deployed to ${{ steps.target.outputs.env }} successfully!'
+            echo '✅ ${{ env.PLUGIN_PATH }} deployed to 🚀 PRODUCTION successfully!'
           "
