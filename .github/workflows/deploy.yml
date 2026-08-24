@@ -23,7 +23,7 @@ jobs:
         id: target
         run: |
           if [ "${{ github.ref_name }}" = "staging" ]; then
-            echo "host=80.225.79.61"                                      >> $GITHUB_OUTPUT
+            echo "host=${{ secrets.STAGING_SSH_HOST || '80.225.79.61' }}" >> $GITHUB_OUTPUT
             echo "dir=/home/ubuntu/moodle-staging/${{ env.PLUGIN_PATH }}" >> $GITHUB_OUTPUT
             echo "container=moodle-staging-app"                           >> $GITHUB_OUTPUT
             echo "key=${{ secrets.STAGING_SSH_KEY }}"                     >> $GITHUB_OUTPUT

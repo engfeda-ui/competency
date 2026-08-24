@@ -1,0 +1,41 @@
+# Operating System files
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+desktop.ini
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+.zcode/
+
+# Local Agent / AI Rules & State
+.agents/
+
+# Secrets and Local Configurations
+.env
+.env.*
+*.key
+*.pem
+
+# Log and Temporary files
+*.log
+*.tmp
+temp/
+tmp/
+
+# Packaging and Build Artifacts
+*.zip
+*.tar.gz
+packaged_plugins/
