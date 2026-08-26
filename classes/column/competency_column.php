@@ -119,6 +119,8 @@ class competency_column extends column_base {
               FROM {tag_instance} ti
               JOIN {tag} t ON ti.tagid = t.id
              WHERE ti.itemid = ?
+               AND ti.component = 'core_question'
+               AND ti.itemtype = 'question'
         ", [$questionid]);
 
         if (!empty($qtags)) {

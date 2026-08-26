@@ -4,7 +4,7 @@
 [![PHP Version](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-blue.svg?style=flat-square)](https://php.net)
 [![Database](https://img.shields.io/badge/Database-PostgreSQL%20%7C%20MySQL%20%7C%20MariaDB-purple.svg?style=flat-square)](https://docs.moodle.org)
 [![License](https://img.shields.io/badge/License-GPL%20v3-green.svg?style=flat-square)](http://www.gnu.org/copyleft/gpl.html)
-[![Version](https://img.shields.io/badge/Version-v2.3.5-blue.svg?style=flat-square)](https://github.com/engfeda-ui/competency)
+[![Version](https://img.shields.io/badge/Version-v2.3.6-blue.svg?style=flat-square)](https://github.com/engfeda-ui/competency)
 
 A professional Moodle Question Bank plugin that allows course creators and teachers to link individual questions to specific Moodle competencies. This forms the data foundation of a competency-based assessment and learning analytics system.
 
@@ -124,6 +124,9 @@ graph TD
 ---
 
 ## 📋 Changelog
+
+### v2.3.6 — 2026-08-26
+- **Security:** Filtered tag auto-sync query in the competency column by `component = 'core_question'` and `itemtype = 'question'` — previously, tag instances from unrelated components whose itemid collided with a question id could trigger bogus competency mappings.
 
 ### v2.3.5 — 2026-08-24
 - **Documentation:** Corrected installation directory path note to `comp_ext` and documented Arabic language pack support.
