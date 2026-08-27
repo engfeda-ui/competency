@@ -10,7 +10,7 @@ env:
 
 jobs:
   deploy:
-    name: 🚀 Deploy ${{ env.PLUGIN_PATH }}
+    name: 🚀 Deploy question/bank/comp_ext
     runs-on: ubuntu-latest
 
     steps:
