@@ -26,21 +26,24 @@ jobs:
       - name: Add Host to Known Hosts
         run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      # ── 2. نقل الملفات باستخدام rsync ──────────────────────────
+      # ── 2. نقل الملفات باستخدام rsync مع صلاحيات sudo ──────────────
       - name: Deploy plugin files
         run: |
-          rsync -avz --delete \
+          rsync -avz --no-owner --no-group --delete \
+            --rsync-path="sudo rsync" \
             --exclude='.git' \
             --exclude='.github' \
             --exclude='.gitignore' \
             --exclude='.gitattributes' \
             --exclude='.agents' \
+            --exclude='.zcode' \
             ./ ubuntu@${{ secrets.SSH_HOST }}:/home/ubuntu/moodle-project/${{ env.PLUGIN_PATH }}/
 
-      # ── 3. ترقية المودل ومسح الكاش داخل الحاوية بصلاحيات الويب ──
+      # ── 3. ضبط الصلاحيات وترقية المودل ومسح الكاش ────────────────
       - name: Upgrade Moodle & Clear Caches
         run: |
           ssh ubuntu@${{ secrets.SSH_HOST }} "
+            sudo chown -R www-data:www-data /home/ubuntu/moodle-project/${{ env.PLUGIN_PATH }}
             docker exec -u www-data moodle-app \
               php /var/www/html/admin/cli/upgrade.php --non-interactive 2>&1 | tail -3
             docker exec -u www-data moodle-app \
