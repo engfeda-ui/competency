@@ -22,6 +22,9 @@ desktop.ini
 
 # Local Agent / AI Rules & State
 .agents/
+AGENTS.md
+*-Mahmoud*
+*-Mahmoud.*
 
 # Secrets and Local Configurations
 .env
