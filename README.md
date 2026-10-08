@@ -5,7 +5,7 @@
 [![PHP Version](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-blue.svg?style=flat-square)](https://php.net)
 [![Database](https://img.shields.io/badge/Database-PostgreSQL%20%7C%20MySQL%20%7C%20MariaDB-purple.svg?style=flat-square)](https://docs.moodle.org)
 [![License](https://img.shields.io/badge/License-GPL%20v3-green.svg?style=flat-square)](http://www.gnu.org/copyleft/gpl.html)
-[![Version](https://img.shields.io/badge/Version-v2.4.0-blue.svg?style=flat-square)](https://github.com/engfeda-ui/competency)
+[![Version](https://img.shields.io/badge/Version-v2.4.1-blue.svg?style=flat-square)](https://github.com/engfeda-ui/competency)
 
 A professional Moodle Question Bank plugin that allows course creators and teachers to link individual questions to specific Moodle competencies. This forms the data foundation of a competency-based assessment and learning analytics system.
 
@@ -126,7 +126,12 @@ graph TD
 
 ## 📋 Changelog
 
-### v2.4.0 — 2026-10-08
+### v2.4.1 — 2026-10-08
+- **Hardening & High-Throughput Optimization (OpenCode Multi-Agent Audit Implementation):**
+  - **Static Stop-Word Map Caching:** Eliminated redundant per-token `array_flip` allocations by memoizing English and Arabic stop-word lookup tables statically.
+  - **Competency Keyword Set Memoization:** Added class-level `$comp_kw_cache` in `auto_mapper.php` so candidate competencies are tokenized and scored once across hundreds of batch questions rather than recomputed on every question ($O(M)$ instead of $O(N \times M)$).
+  - **Comprehensive Unicode Arabic Character Class:** Standardized Arabic diacritic stripping and character classification using Unicode property classes (`\p{Mn}` and `\p{Arabic}`), safely supporting all Arabic supplements and combining marks without ReDoS risk.
+
 - **Feature (3-Tier Question-to-Competency Mapping Engine):**
   - **Tier 1 (Explicit GIFT Tags):** Continues to support direct `comp-*` tags embedded in question files.
   - **Tier 2 (Psychometric Auto-Mapping Engine):** Introduced `\qbank_comp_ext\auto_mapper` implementing bilingual (Arabic & English) stemming, normalization, and stop-word filtering matching the SANAD platform (`itp.sanad.ws`) algorithm with minimum threshold `0.20`. Auto-suggests and links questions without explicit tags to course competencies (`{competency_coursecomp}`).

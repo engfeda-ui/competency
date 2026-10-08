@@ -52,15 +52,35 @@ class auto_mapper {
         'معد', 'سؤال', 'اسئله'
     ];
 
+    /** @var array|null Cached flipped stop word maps */
+    private static $stop_en_map = null;
+    private static $stop_ar_map = null;
+
+    /** @var array In-memory cache for competency keyword sets: [comp_id => [token => weight]] */
+    private static $comp_kw_cache = [];
+
     /**
-     * Arabic word normalization.
+     * Get or initialize flipped stop word maps.
+     *
+     * @return array [0 => $stop_en_map, 1 => $stop_ar_map]
+     */
+    private static function get_stop_maps(): array {
+        if (self::$stop_en_map === null) {
+            self::$stop_en_map = array_flip(self::$stop_en);
+            self::$stop_ar_map = array_flip(self::$stop_ar);
+        }
+        return [self::$stop_en_map, self::$stop_ar_map];
+    }
+
+    /**
+     * Arabic word normalization with comprehensive Unicode combining diacritic removal.
      *
      * @param string $w
      * @return string
      */
     public static function norm_ar_word(string $w): string {
-        // Strip diacritics and tatweel.
-        $s = preg_replace('/[\x{064B}-\x{065F}\x{0670}\x{0640}]/u', '', $w);
+        // Strip all combining diacritics (\p{Mn}) and tatweel (U+0640) in one unified Unicode pattern.
+        $s = preg_replace('/[\p{Mn}\x{0640}]/u', '', $w);
         // Unify alifs.
         $s = preg_replace('/[أإآ]/u', 'ا', $s);
         // Normalize ending taa marbuta and alif maqsura.
@@ -116,17 +136,17 @@ class auto_mapper {
         $tokens = [];
         // Add spacing around camelCase.
         $spaced = preg_replace('/([a-z])([A-Z])/', '$1 $2', $text);
-        // Split words by punctuation/spaces.
-        $words = preg_split('/[^a-z0-9\x{0600}-\x{06FF}]+/u', mb_strtolower($spaced));
+        // Split words by non-alphanumeric and non-Arabic characters.
+        $words = preg_split('/[^\p{L}\p{N}]+/u', mb_strtolower($spaced));
 
-        $stop_en_map = array_flip(self::$stop_en);
-        $stop_ar_map = array_flip(self::$stop_ar);
+        [$stop_en_map, $stop_ar_map] = self::get_stop_maps();
 
         foreach ($words as $raw) {
             if ($raw === '' || is_numeric($raw)) {
                 continue;
             }
-            if (preg_match('/^[\x{0600}-\x{06FF}]+$/u', $raw)) {
+            // Check for Arabic using Unicode script property.
+            if (preg_match('/^\p{Arabic}+$/u', $raw)) {
                 $p = self::norm_ar_word($raw);
                 if (mb_strlen($p) < 2 || isset($stop_ar_map[$p])) {
                     continue;
@@ -144,12 +164,17 @@ class auto_mapper {
     }
 
     /**
-     * Build weighted keyword map for a competency.
+     * Build weighted keyword map for a competency (memoized for high throughput).
      *
      * @param stdClass $comp Competency object with shortname, idnumber, description.
      * @return array [token => weight]
      */
     public static function comp_keyword_set(stdClass $comp): array {
+        $cid = (int)($comp->id ?? 0);
+        if ($cid > 0 && isset(self::$comp_kw_cache[$cid])) {
+            return self::$comp_kw_cache[$cid];
+        }
+
         $kw = [];
         $add = function($src, $w) use (&$kw) {
             if (empty($src)) {
@@ -166,6 +191,10 @@ class auto_mapper {
         $add($comp->shortname ?? '', 1);
         $add($comp->description ?? '', 1);
 
+        if ($cid > 0) {
+            self::$comp_kw_cache[$cid] = $kw;
+        }
+
         return $kw;
     }
 
@@ -181,10 +210,11 @@ class auto_mapper {
             return null;
         }
 
-        $qtokens = array_flip(self::comp_tokens(strip_tags($questiontext)));
-        if (empty($qtokens)) {
+        $tokens = self::comp_tokens(strip_tags($questiontext));
+        if (empty($tokens)) {
             return null;
         }
+        $qtokens = array_flip($tokens);
 
         $bestcomp = null;
         $bestscore = 0.0;
