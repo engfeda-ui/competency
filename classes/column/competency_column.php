@@ -43,6 +43,9 @@ class competency_column extends column_base {
     /** @var array|null $competencyoptions Store available competencies for the course. */
     protected $competencyoptions = null;
 
+    /** @var array|null $coursecompetencies Store full competency records for auto-mapping. */
+    protected $coursecompetencies = null;
+
     /**
      * Initialize the column.
      *
@@ -146,6 +149,39 @@ class competency_column extends column_base {
                                 unset($e);
                             }
                         }
+                    }
+                }
+            }
+        }
+
+        // Auto-map questions without tags or existing mappings using question text matching.
+        if (empty($selectedids)) {
+            if ($this->coursecompetencies === null) {
+                $this->coursecompetencies = $DB->get_records_sql("
+                    SELECT c.id, c.shortname, c.idnumber, c.description
+                      FROM {competency} c
+                      JOIN {competency_coursecomp} cc ON cc.competencyid = c.id
+                     WHERE cc.courseid = ?
+                     ORDER BY c.shortname
+                ", [$courseid]);
+            }
+
+            if (!empty($this->coursecompetencies)) {
+                $qtext = ($question->name ?? '') . ' ' . ($question->questiontext ?? '');
+                $suggested = \qbank_comp_ext\auto_mapper::suggest_competency($qtext, $this->coursecompetencies);
+
+                if ($suggested && isset($this->competencyoptions[$suggested->id])) {
+                    $rec = (object)[
+                        'questionid'   => $questionid,
+                        'courseid'     => $courseid,
+                        'competencyid' => (int)$suggested->id,
+                        'timecreated'  => time(),
+                    ];
+                    try {
+                        $DB->insert_record('qbank_comp_ext_qmap', $rec);
+                        $selectedids[] = (int)$suggested->id;
+                    } catch (\Throwable $e) {
+                        unset($e);
                     }
                 }
             }

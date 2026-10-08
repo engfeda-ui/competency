@@ -30,3 +30,4 @@ $string['none'] = 'None';
 $string['pluginname'] = 'Question Bank Competency Mapping';
 $string['privacy:metadata'] = 'The Question Bank Competency Mapping plugin does not store any personal data; it only maps questions to competencies.';
 $string['selectcompetency'] = 'Select competency...';
+$string['automap_done'] = 'Auto-mapped competency';

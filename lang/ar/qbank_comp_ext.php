@@ -28,4 +28,5 @@ $string['pluginname'] = 'ربط أسئلة بنك الأسئلة بالجدار�
 $string['competency'] = 'الجدارة';
 $string['none'] = 'لا شيء';
 $string['selectcompetency'] = 'اختر الجدارة...';
+$string['automap_done'] = 'تم تعيين الجدارة تلقائياً';
 $string['privacy:metadata'] = 'إضافة ربط الأسئلة بالجدارات الفنية لا تقوم بتخزين أي بيانات شخصية للطلاب.';
