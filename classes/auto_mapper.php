@@ -52,8 +52,10 @@ class auto_mapper {
         'معد', 'سؤال', 'اسئله',
     ];
 
-    /** @var array|null Cached flipped stop word maps */
+    /** @var array|null Cached English stop word map */
     private static $stopenmap = null;
+
+    /** @var array|null Cached Arabic stop word map */
     private static $stoparmap = null;
 
     /** @var array In-memory cache for competency keyword sets: [comp_id => [token => weight]] */
