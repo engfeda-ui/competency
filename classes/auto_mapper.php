@@ -33,43 +33,43 @@ class auto_mapper {
     const MIN_SCORE = 0.20;
 
     /** @var array English stop words */
-    private static $stop_en = [
+    private static $stopen = [
         'a', 'an', 'the', 'of', 'and', 'or', 'for', 'to', 'in', 'on', 'with', 'by', 'from',
         'is', 'are', 'was', 'were', 'be', 'as', 'at', 'that', 'this', 'these', 'those', 'it',
         'its', 'what', 'which', 'how', 'when', 'explain', 'describe', 'define', 'following',
         'choose', 'select', 'correct', 'statement', 'statements', 'answer', 'answers', 'given',
         'using', 'use', 'used', 'value', 'values', 'shown', 'below', 'above', 'example',
-        'figure', 'order', 'system', 'systems', 'device', 'devices', 'equipment', 'question', 'questions'
+        'figure', 'order', 'system', 'systems', 'device', 'devices', 'equipment', 'question', 'questions',
     ];
 
     /** @var array Arabic stop words */
-    private static $stop_ar = [
+    private static $stopar = [
         'من', 'في', 'على', 'إلى', 'عن', 'أن', 'إن', 'التي', 'الذي', 'هذا', 'هذه', 'ذلك', 'تلك',
         'أو', 'ثم', 'بين', 'كل', 'بعض', 'عند', 'مع', 'هل', 'ماذا', 'كيف', 'أي', 'يتم', 'تكون',
         'كان', 'يكون', 'ما', 'لا', 'هو', 'هي', 'هم', 'كما', 'بعد', 'قبل', 'حيث', 'إذا', 'قد',
         'أحد', 'عندما', 'أثناء', 'خلال', 'دون', 'غير', 'بينما', 'وهو', 'وهي', 'يلي', 'التالي',
         'التالية', 'صح', 'خطأ', 'اختر', 'حدد', 'اشرح', 'عرف', 'نظام', 'انظمه', 'جهاز', 'اجهزه',
-        'معد', 'سؤال', 'اسئله'
+        'معد', 'سؤال', 'اسئله',
     ];
 
     /** @var array|null Cached flipped stop word maps */
-    private static $stop_en_map = null;
-    private static $stop_ar_map = null;
+    private static $stopenmap = null;
+    private static $stoparmap = null;
 
     /** @var array In-memory cache for competency keyword sets: [comp_id => [token => weight]] */
-    private static $comp_kw_cache = [];
+    private static $compkwcache = [];
 
     /**
      * Get or initialize flipped stop word maps.
      *
-     * @return array [0 => $stop_en_map, 1 => $stop_ar_map]
+     * @return array [0 => $stopenmap, 1 => $stoparmap]
      */
     private static function get_stop_maps(): array {
-        if (self::$stop_en_map === null) {
-            self::$stop_en_map = array_flip(self::$stop_en);
-            self::$stop_ar_map = array_flip(self::$stop_ar);
+        if (self::$stopenmap === null) {
+            self::$stopenmap = array_flip(self::$stopen);
+            self::$stoparmap = array_flip(self::$stopar);
         }
-        return [self::$stop_en_map, self::$stop_ar_map];
+        return [self::$stopenmap, self::$stoparmap];
     }
 
     /**
@@ -139,7 +139,7 @@ class auto_mapper {
         // Split words by non-alphanumeric and non-Arabic characters.
         $words = preg_split('/[^\p{L}\p{N}]+/u', mb_strtolower($spaced));
 
-        [$stop_en_map, $stop_ar_map] = self::get_stop_maps();
+        [$stopenmap, $stoparmap] = self::get_stop_maps();
 
         foreach ($words as $raw) {
             if ($raw === '' || is_numeric($raw)) {
@@ -148,13 +148,13 @@ class auto_mapper {
             // Check for Arabic using Unicode script property.
             if (preg_match('/^\p{Arabic}+$/u', $raw)) {
                 $p = self::norm_ar_word($raw);
-                if (mb_strlen($p) < 2 || isset($stop_ar_map[$p])) {
+                if (mb_strlen($p) < 2 || isset($stoparmap[$p])) {
                     continue;
                 }
                 $tokens['ar:' . $p] = true;
             } else if (preg_match('/^[a-z0-9]+$/', $raw)) {
                 $p = self::stem_en_word($raw);
-                if (strlen($p) < 2 || isset($stop_en_map[$p])) {
+                if (strlen($p) < 2 || isset($stopenmap[$p])) {
                     continue;
                 }
                 $tokens['en:' . $p] = true;
@@ -171,12 +171,12 @@ class auto_mapper {
      */
     public static function comp_keyword_set(stdClass $comp): array {
         $cid = (int)($comp->id ?? 0);
-        if ($cid > 0 && isset(self::$comp_kw_cache[$cid])) {
-            return self::$comp_kw_cache[$cid];
+        if ($cid > 0 && isset(self::$compkwcache[$cid])) {
+            return self::$compkwcache[$cid];
         }
 
         $kw = [];
-        $add = function($src, $w) use (&$kw) {
+        $add = function ($src, $w) use (&$kw) {
             if (empty($src)) {
                 return;
             }
@@ -192,7 +192,7 @@ class auto_mapper {
         $add($comp->description ?? '', 1);
 
         if ($cid > 0) {
-            self::$comp_kw_cache[$cid] = $kw;
+            self::$compkwcache[$cid] = $kw;
         }
 
         return $kw;
@@ -225,14 +225,14 @@ class auto_mapper {
                 continue;
             }
 
-            $score_sum = 0.0;
+            $scoresum = 0.0;
             $hits = 0;
             $norm = 0.0;
 
             foreach ($kw as $tok => $w) {
                 $norm += $w;
                 if (isset($qtokens[$tok])) {
-                    $score_sum += $w;
+                    $scoresum += $w;
                     $hits++;
                 }
             }
@@ -241,7 +241,7 @@ class auto_mapper {
                 continue;
             }
 
-            $score = $score_sum / $norm;
+            $score = $scoresum / $norm;
             if ($hits >= 1 && $score >= self::MIN_SCORE && $score > $bestscore) {
                 $bestscore = $score;
                 $bestcomp = clone $comp;

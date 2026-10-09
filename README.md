@@ -5,7 +5,7 @@
 [![PHP Version](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-blue.svg?style=flat-square)](https://php.net)
 [![Database](https://img.shields.io/badge/Database-PostgreSQL%20%7C%20MySQL%20%7C%20MariaDB-purple.svg?style=flat-square)](https://docs.moodle.org)
 [![License](https://img.shields.io/badge/License-GPL%20v3-green.svg?style=flat-square)](http://www.gnu.org/copyleft/gpl.html)
-[![Version](https://img.shields.io/badge/Version-v2.4.1-blue.svg?style=flat-square)](https://github.com/engfeda-ui/competency)
+[![Version](https://img.shields.io/badge/Version-v2.4.2-blue.svg?style=flat-square)](https://github.com/engfeda-ui/competency)
 
 A professional Moodle Question Bank plugin that allows course creators and teachers to link individual questions to specific Moodle competencies. This forms the data foundation of a competency-based assessment and learning analytics system.
 
@@ -125,6 +125,12 @@ graph TD
 ---
 
 ## 📋 Changelog
+
+### v2.4.2 — 2026-10-09
+- **Code Compliance & Moodle CodeChecker Standard:**
+  - Standardized all variable and property names in `classes/auto_mapper.php` (`$stopen`, `$stopar`, `$stopenmap`, `$stoparmap`, `$compkwcache`, `$scoresum`) to eliminate underscores per Moodle naming conventions.
+  - Wrapped long boolean expression in `classes/column/competency_column.php` to strictly comply with Moodle's 132-character line length limit.
+  - Formatted closure declarations with standard spacing after `function` keyword.
 
 ### v2.4.1 — 2026-10-08
 - **Hardening & High-Throughput Optimization (OpenCode Multi-Agent Audit Implementation):**

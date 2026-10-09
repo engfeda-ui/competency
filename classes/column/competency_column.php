@@ -134,7 +134,11 @@ class competency_column extends column_base {
 
                 foreach ($this->competencyoptions as $compid => $shortname) {
                     $complower = strtolower($shortname);
-                    if ($complower === $tagname || $complower === $rawname || $complower === $cleanname || ('comp-' . $complower) === $tagname) {
+                    $matches = ($complower === $tagname ||
+                                $complower === $rawname ||
+                                $complower === $cleanname ||
+                                ('comp-' . $complower) === $tagname);
+                    if ($matches) {
                         if (!in_array($compid, $selectedids)) {
                             $rec = (object)[
                                 'questionid'   => $questionid,
