@@ -16,6 +16,7 @@
             </KEYS>
             <INDEXES>
                 <INDEX NAME="course_question_idx" UNIQUE="false" FIELDS="courseid, questionid" COMMENT="Index to speed up competency lookups for questions within a specific course"/>
+                <INDEX NAME="question_course_comp_idx" UNIQUE="true" FIELDS="questionid, courseid, competencyid" COMMENT="Enforce uniqueness of question, course, competency triple"/>
             </INDEXES>
         </TABLE>
     </TABLES>

@@ -31,3 +31,5 @@ $string['pluginname'] = 'Question Bank Competency Mapping';
 $string['privacy:metadata'] = 'The Question Bank Competency Mapping plugin does not store any personal data; it only maps questions to competencies.';
 $string['selectcompetency'] = 'Select competency...';
 $string['automap_done'] = 'Auto-mapped competency';
+$string['questionnotincourse'] = 'The question does not belong to this course.';
+$string['competencynotincourse'] = 'The competency does not exist or is not linked to this course.';

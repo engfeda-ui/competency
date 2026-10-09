@@ -29,4 +29,6 @@ $string['competency'] = 'الجدارة';
 $string['none'] = 'لا شيء';
 $string['selectcompetency'] = 'اختر الجدارة...';
 $string['automap_done'] = 'تم تعيين الجدارة تلقائياً';
+$string['questionnotincourse'] = 'هذا السؤال لا ينتمي إلى هذا المقرر.';
+$string['competencynotincourse'] = 'هذه الكفاءة غير موجودة أو غير مرتبطة بهذا المقرر.';
 $string['privacy:metadata'] = 'إضافة ربط الأسئلة بالجدارات الفنية لا تقوم بتخزين أي بيانات شخصية للطلاب.';

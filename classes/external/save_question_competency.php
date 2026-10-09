@@ -90,8 +90,40 @@ class save_question_competency extends external_api {
         self::validate_context($context);
         require_capability('moodle/course:manageactivities', $context);
 
+        // Ownership validation: the question must exist and belong to this course
+        // (or to a shared system bank); competencies must exist and be linked to it.
+        $question = $DB->get_record('question', ['id' => $params['questionid']], 'id, category', MUST_EXIST);
+        $category = $DB->get_record('question_categories', ['id' => $question->category], 'id, contextid', MUST_EXIST);
+        $questioncontext = \context::instance_by_id($category->contextid, MUST_EXIST);
+        $questioncourse = $questioncontext->get_course_context(false);
+        $fromsharedbank = ($questioncontext->contextlevel == CONTEXT_SYSTEM);
+        $fromthiscourse = ($questioncourse && (int)$questioncourse->instanceid === (int)$params['courseid']);
+        if (!$fromsharedbank && !$fromthiscourse) {
+            throw new \invalid_parameter_exception('questionnotincourse');
+        }
+        $validcompids = [];
+        foreach ($params['competencyids'] as $compid) {
+            $compid = (int)$compid;
+            if ($compid <= 0 || isset($validcompids[$compid])) {
+                continue;
+            }
+            $linked = $DB->record_exists_sql(
+                "SELECT 1 FROM {competency} c
+                  JOIN {competency_coursecomp} cc ON cc.competencyid = c.id
+                 WHERE c.id = :compid AND cc.courseid = :courseid",
+                ['compid' => $compid, 'courseid' => $params['courseid']]
+            );
+            if (!$linked) {
+                throw new \invalid_parameter_exception('competencynotincourse');
+            }
+            $validcompids[$compid] = true;
+        }
+
         $table = 'qbank_comp_ext_qmap';
         $now   = time();
+
+        // Atomic full replace: delete + re-insert inside one transaction.
+        $transaction = $DB->start_delegated_transaction();
 
         // Delete ALL existing mappings for this question+course atomically.
         $DB->delete_records($table, [
@@ -99,14 +131,8 @@ class save_question_competency extends external_api {
             'courseid'   => $params['courseid'],
         ]);
 
-        // Re-insert one record per competency ID (deduplicated).
-        $seen = [];
-        foreach ($params['competencyids'] as $compid) {
-            if ($compid <= 0 || isset($seen[$compid])) {
-                continue; // Skip 0 / duplicates.
-            }
-            $seen[$compid] = true;
-
+        // Re-insert one record per validated competency ID (deduplicated).
+        foreach (array_keys($validcompids) as $compid) {
             $record               = new stdClass();
             $record->questionid   = $params['questionid'];
             $record->competencyid = $compid;
@@ -114,6 +140,8 @@ class save_question_competency extends external_api {
             $record->timecreated  = $now;
             $DB->insert_record($table, $record);
         }
+
+        $transaction->allow_commit();
 
         return true;
     }

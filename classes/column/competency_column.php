@@ -46,6 +46,12 @@ class competency_column extends column_base {
     /** @var array|null $coursecompetencies Store full competency records for auto-mapping. */
     protected $coursecompetencies = null;
 
+    /** @var array $coursemapcache Bulk-loaded qmap per course: [courseid => [questionid => [compids]]]. */
+    protected static $coursemapcache = [];
+
+    /** @var array $tagcache Per-question tag cache to avoid repeat queries on re-render. */
+    protected static $tagcache = [];
+
     /**
      * Initialize the column.
      *
@@ -107,17 +113,22 @@ class competency_column extends column_base {
             return;
         }
 
-        // Fetch ALL current mappings for this question in this course.
-        $currentmappings = $DB->get_records('qbank_comp_ext_qmap', [
-            'courseid'   => $courseid,
-            'questionid' => $questionid,
-        ], '', 'competencyid');
+        // Bulk-loaded mappings for the whole course (one query per course, not per row).
+        // Read-only: never writes during render. Use cli/automap.php or cron for persistence.
+        if (!isset(self::$coursemapcache[$courseid])) {
+            self::$coursemapcache[$courseid] = [];
+            $allmaps = $DB->get_records('qbank_comp_ext_qmap', ['courseid' => $courseid], '', 'id, questionid, competencyid');
+            foreach ($allmaps as $map) {
+                self::$coursemapcache[$courseid][$map->questionid][] = (int)$map->competencyid;
+            }
+        }
 
-        // Build array of selected competency IDs.
-        $selectedids = array_keys($currentmappings);
+        // Build array of selected competency IDs from bulk cache.
+        $selectedids = self::$coursemapcache[$courseid][$questionid] ?? [];
 
-        // Auto-sync question tags to competencies if not already mapped in database.
-        $qtags = $DB->get_records_sql("
+        // Suggest from question tags (in-memory only; persistence via CLI/cron).
+        if (!isset(self::$tagcache[$questionid])) {
+            self::$tagcache[$questionid] = $DB->get_records_sql("
             SELECT t.name, t.rawname
               FROM {tag_instance} ti
               JOIN {tag} t ON ti.tagid = t.id
@@ -125,6 +136,8 @@ class competency_column extends column_base {
                AND ti.component = 'core_question'
                AND ti.itemtype = 'question'
         ", [$questionid]);
+        }
+        $qtags = self::$tagcache[$questionid];
 
         if (!empty($qtags)) {
             foreach ($qtags as $qtag) {
@@ -140,25 +153,14 @@ class competency_column extends column_base {
                                 ('comp-' . $complower) === $tagname);
                     if ($matches) {
                         if (!in_array($compid, $selectedids)) {
-                            $rec = (object)[
-                                'questionid'   => $questionid,
-                                'courseid'     => $courseid,
-                                'competencyid' => $compid,
-                                'timecreated'  => time(),
-                            ];
-                            try {
-                                $DB->insert_record('qbank_comp_ext_qmap', $rec);
-                                $selectedids[] = $compid;
-                            } catch (\Throwable $e) {
-                                unset($e);
-                            }
+                            $selectedids[] = $compid;
                         }
                     }
                 }
             }
         }
 
-        // Auto-map questions without tags or existing mappings using question text matching.
+        // Suggest via text matching for unmapped questions (display only, no DB write).
         if (empty($selectedids)) {
             if ($this->coursecompetencies === null) {
                 $this->coursecompetencies = $DB->get_records_sql("
@@ -175,18 +177,7 @@ class competency_column extends column_base {
                 $suggested = \qbank_comp_ext\auto_mapper::suggest_competency($qtext, $this->coursecompetencies);
 
                 if ($suggested && isset($this->competencyoptions[$suggested->id])) {
-                    $rec = (object)[
-                        'questionid'   => $questionid,
-                        'courseid'     => $courseid,
-                        'competencyid' => (int)$suggested->id,
-                        'timecreated'  => time(),
-                    ];
-                    try {
-                        $DB->insert_record('qbank_comp_ext_qmap', $rec);
-                        $selectedids[] = (int)$suggested->id;
-                    } catch (\Throwable $e) {
-                        unset($e);
-                    }
+                    $selectedids[] = (int)$suggested->id;
                 }
             }
         }

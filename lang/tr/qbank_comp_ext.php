@@ -30,3 +30,5 @@ $string['none'] = 'Yok';
 $string['pluginname'] = 'Soru Bankası Competency Eşleştirme';
 $string['privacy:metadata'] = 'Soru Bankası Competency eklentisi herhangi bir kişisel veri depolamaz; sadece sorular ile competencyler arasındaki eşleştirmeleri saklar.';
 $string['selectcompetency'] = 'Competency seçiniz...';
+$string['questionnotincourse'] = 'Soru bu kursa ait degil.';
+$string['competencynotincourse'] = 'Competency mevcut degil veya bu kursa bagli degil.';

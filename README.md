@@ -5,7 +5,7 @@
 [![PHP Version](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-blue.svg?style=flat-square)](https://php.net)
 [![Database](https://img.shields.io/badge/Database-PostgreSQL%20%7C%20MySQL%20%7C%20MariaDB-purple.svg?style=flat-square)](https://docs.moodle.org)
 [![License](https://img.shields.io/badge/License-GPL%20v3-green.svg?style=flat-square)](http://www.gnu.org/copyleft/gpl.html)
-[![Version](https://img.shields.io/badge/Version-v2.4.3-blue.svg?style=flat-square)](https://github.com/engfeda-ui/competency)
+[![Version](https://img.shields.io/badge/Version-v2.4.5-blue.svg?style=flat-square)](https://github.com/engfeda-ui/competency)
 
 A professional Moodle Question Bank plugin that allows course creators and teachers to link individual questions to specific Moodle competencies. This forms the data foundation of a competency-based assessment and learning analytics system.
 
@@ -125,6 +125,18 @@ graph TD
 ---
 
 ## 📋 Changelog
+
+### v2.4.5 — 2026-10-09
+- **Ownership Validation (`external/save_question_competency.php`):**
+  - The question must exist and belong to the course (or a shared system bank); every competency must exist and be linked to the course, else `invalid_parameter_exception`.
+  - Full replace now runs inside a delegated transaction (atomic, race-safe).
+  - New unique index `(questionid, courseid, competencyid)` via `db/upgrade.php` with duplicate cleanup.
+
+### v2.4.4 — 2026-10-09
+- **P0 Read-Path Hardening (`classes/column/competency_column.php`):**
+  - Removed all `insert_record` writes from `display_content()` — column is now strictly read-only (persistence via `cli/automap.php` / cron).
+  - Bulk-loads whole-course qmap once per request (`coursemapcache`) instead of one query per question row; per-question tags cached (`tagcache`).
+  - Tag/text suggestions now in-memory only for display.
 
 ### v2.4.3 — 2026-10-09
 - **CodeChecker Fix:** Added separate member variable doc comment for `$stoparmap` in `classes/auto_mapper.php` to strictly satisfy Moodle `VariableComment.Missing` sniff.
