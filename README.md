@@ -1,11 +1,11 @@
 # 🎓 Moodle Question Bank Plugin: Competency (`qbank_comp_ext`)
 
-[![Moodle Plugin CI](https://github.com/engfeda-ui/competency/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/engfeda-ui/competency/actions/workflows/ci.yml)
+[![Moodle Plugin CI](https://github.com/engfeda-ui/moodle-qbank_comp_ext/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/engfeda-ui/moodle-qbank_comp_ext/actions/workflows/ci.yml)
 [![Moodle Compatibility](https://img.shields.io/badge/Moodle-4.5%20%7C%205.0%2B-orange.svg?style=flat-square)](https://moodle.org)
 [![PHP Version](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-blue.svg?style=flat-square)](https://php.net)
 [![Database](https://img.shields.io/badge/Database-PostgreSQL%20%7C%20MySQL%20%7C%20MariaDB-purple.svg?style=flat-square)](https://docs.moodle.org)
 [![License](https://img.shields.io/badge/License-GPL%20v3-green.svg?style=flat-square)](http://www.gnu.org/copyleft/gpl.html)
-[![Version](https://img.shields.io/badge/Version-v2.4.6-blue.svg?style=flat-square)](https://github.com/engfeda-ui/competency)
+[![Version](https://img.shields.io/badge/Version-v2.4.7-blue.svg?style=flat-square)](https://github.com/engfeda-ui/moodle-qbank_comp_ext)
 
 A professional Moodle Question Bank plugin that allows course creators and teachers to link individual questions to specific Moodle competencies. This forms the data foundation of a competency-based assessment and learning analytics system.
 
@@ -125,6 +125,13 @@ graph TD
 ---
 
 ## 📋 Changelog
+
+### v2.4.7 — 2026-10-11
+- **Repository Harmonization & Directory Review Alignment:**
+  - Renamed repository from `competency` to `moodle-qbank_comp_ext` following the official Moodle plugin repository naming convention `moodle-{plugintype}_{pluginname}`.
+  - Resolved and closed GitHub Issue #1 (Repository name recommendation).
+  - Resolved and closed GitHub Issue #2 (Cross-course bank analytics and session lock deadlock) verified across `qbank_comp_ext` (v2.4.5, v2.4.6) and `local_comp_report_ext` (v3.26.2, v3.26.4).
+  - Updated CI workflows, badges, and remote links to `engfeda-ui/moodle-qbank_comp_ext`.
 
 ### v2.4.6 — 2026-10-11
 - **Fix (Moodle 4.0+ Question Schema Compatibility):**

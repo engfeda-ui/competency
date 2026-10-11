@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 /** @var stdClass $plugin */
 $plugin->component = 'qbank_comp_ext';    // Full name of the plugin (category_name).
-$plugin->version   = 2026101101;           // The current module version (YYYYMMDDXX).
+$plugin->version   = 2026101102;           // The current module version (YYYYMMDDXX).
 $plugin->requires  = 2024042210;           // Requires Moodle 4.5 or later.
 $plugin->maturity  = MATURITY_STABLE;       // Maturity level of the plugin.
-$plugin->release   = '2.4.6';              // Human-readable version name.
+$plugin->release   = '2.4.7';              // Human-readable version name.
