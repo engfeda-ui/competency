@@ -91,16 +91,37 @@ class save_question_competency extends external_api {
         require_capability('moodle/course:manageactivities', $context);
 
         // Ownership validation: the question must exist and belong to this course
-        // (or to a shared system bank); competencies must exist and be linked to it.
-        $question = $DB->get_record('question', ['id' => $params['questionid']], 'id, category', MUST_EXIST);
-        $category = $DB->get_record('question_categories', ['id' => $question->category], 'id, contextid', MUST_EXIST);
-        $questioncontext = \context::instance_by_id($category->contextid, MUST_EXIST);
+        // (or to a shared system bank / parent category); competencies must exist and be linked to it.
+        if ($DB->get_manager()->table_exists('question_bank_entries')) {
+            $sql = "SELECT q.id, qc.contextid
+                      FROM {question} q
+                      JOIN {question_versions} qv ON qv.questionid = q.id
+                      JOIN {question_bank_entries} qbe ON qbe.id = qv.questionbankentryid
+                      JOIN {question_categories} qc ON qc.id = qbe.questioncategoryid
+                     WHERE q.id = :questionid";
+            $qrec = $DB->get_record_sql($sql, ['questionid' => $params['questionid']], MUST_EXIST);
+            $contextid = $qrec->contextid;
+        } else {
+            $question = $DB->get_record('question', ['id' => $params['questionid']], 'id, category', MUST_EXIST);
+            $category = $DB->get_record('question_categories', ['id' => $question->category], 'id, contextid', MUST_EXIST);
+            $contextid = $category->contextid;
+        }
+
+        $questioncontext = \context::instance_by_id($contextid, MUST_EXIST);
+        $coursecontext = context_course::instance($params['courseid']);
         $questioncourse = $questioncontext->get_course_context(false);
-        $fromsharedbank = ($questioncontext->contextlevel == CONTEXT_SYSTEM);
-        $fromthiscourse = ($questioncourse && (int)$questioncourse->instanceid === (int)$params['courseid']);
-        if (!$fromsharedbank && !$fromthiscourse) {
+
+        $isvalid = false;
+        if ($questioncourse && (int)$questioncourse->instanceid === (int)$params['courseid']) {
+            $isvalid = true;
+        } else if ($questioncontext->is_parent_of($coursecontext, true)) {
+            $isvalid = true;
+        }
+
+        if (!$isvalid) {
             throw new \invalid_parameter_exception('questionnotincourse');
         }
+
         $validcompids = [];
         foreach ($params['competencyids'] as $compid) {
             $compid = (int)$compid;
@@ -142,6 +163,33 @@ class save_question_competency extends external_api {
         }
 
         $transaction->allow_commit();
+
+        // Synchronize question tags so tag badges and filters stay aligned.
+        if (class_exists('\core_tag_tag')) {
+            $existingtags = \core_tag_tag::get_item_tags_array('core_question', 'question', $params['questionid']);
+            $newtags = [];
+            foreach ($existingtags as $tagname) {
+                $iscomp = false;
+                $parts = preg_split('/[,;]+/', $tagname);
+                foreach ($parts as $p) {
+                    $p = trim($p);
+                    if (stripos($p, 'comp-') === 0 || stripos($p, 'comp_') === 0) {
+                        $iscomp = true;
+                        break;
+                    }
+                }
+                if (!$iscomp) {
+                    $newtags[] = $tagname;
+                }
+            }
+            if (!empty($validcompids)) {
+                $compnames = $DB->get_records_list('competency', 'id', array_keys($validcompids), '', 'id, shortname');
+                foreach ($compnames as $c) {
+                    $newtags[] = 'comp-' . $c->shortname;
+                }
+            }
+            \core_tag_tag::set_item_tags('core_question', 'question', $params['questionid'], $questioncontext, $newtags);
+        }
 
         return true;
     }

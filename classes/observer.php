@@ -53,47 +53,58 @@ class observer {
             return;
         }
 
-        $tagname = $DB->get_field('tag', 'name', ['id' => $taginstance->tagid]);
-        if (!$tagname || strpos($tagname, 'comp-') !== 0) {
+        $tag = $DB->get_record('tag', ['id' => $taginstance->tagid], 'id, name, rawname');
+        if (!$tag) {
             return;
         }
 
-        $competencycode = substr($tagname, 5);
-
-        // Find competency by idnumber or shortname (case-insensitive).
-        $competency = $DB->get_record_sql("
-            SELECT * FROM {competency}
-             WHERE LOWER(idnumber) = LOWER(?) OR LOWER(idnumber) = LOWER(?)
-                OR LOWER(shortname) = LOWER(?) OR LOWER(shortname) = LOWER(?)
-        ", [$tagname, $competencycode, $tagname, $competencycode]);
-
-        if (!$competency) {
-            return;
-        }
+        $rawname = !empty($tag->rawname) ? $tag->rawname : $tag->name;
+        $parts = preg_split('/[,;]+/', $rawname);
 
         $courseid = self::resolve_course_id($taginstance->contextid);
         if ($courseid <= 0) {
             return;
         }
 
-        // Add the mapping only if it does not already exist for this
-        // exact (question, course, competency) combination.
-        // This supports multi-competency: adding comp-A and comp-B as
-        // separate tags will create TWO rows in qbank_comp_ext_qmap.
         $table = 'qbank_comp_ext_qmap';
-        $exists = $DB->record_exists($table, [
-            'questionid'   => $taginstance->itemid,
-            'courseid'     => $courseid,
-            'competencyid' => $competency->id,
-        ]);
 
-        if (!$exists) {
-            $newrecord               = new stdClass();
-            $newrecord->questionid   = $taginstance->itemid;
-            $newrecord->competencyid = $competency->id;
-            $newrecord->courseid     = $courseid;
-            $newrecord->timecreated  = time();
-            $DB->insert_record($table, $newrecord);
+        foreach ($parts as $part) {
+            $part = trim($part);
+            if (empty($part)) {
+                continue;
+            }
+            if (stripos($part, 'comp-') !== 0 && stripos($part, 'comp_') !== 0) {
+                continue;
+            }
+
+            $competencycode = substr($part, 5);
+
+            // Find competency by idnumber or shortname (case-insensitive).
+            $competency = $DB->get_record_sql("
+                SELECT * FROM {competency}
+                 WHERE LOWER(idnumber) = LOWER(?) OR LOWER(idnumber) = LOWER(?)
+                    OR LOWER(shortname) = LOWER(?) OR LOWER(shortname) = LOWER(?)
+            ", [$part, $competencycode, $part, $competencycode]);
+
+            if (!$competency) {
+                continue;
+            }
+
+            // Add the mapping only if it does not already exist for this combination.
+            $exists = $DB->record_exists($table, [
+                'questionid'   => $taginstance->itemid,
+                'courseid'     => $courseid,
+                'competencyid' => $competency->id,
+            ]);
+
+            if (!$exists) {
+                $newrecord               = new stdClass();
+                $newrecord->questionid   = $taginstance->itemid;
+                $newrecord->competencyid = $competency->id;
+                $newrecord->courseid     = $courseid;
+                $newrecord->timecreated  = time();
+                $DB->insert_record($table, $newrecord);
+            }
         }
     }
 
@@ -116,34 +127,47 @@ class observer {
             return;
         }
 
-        $tagname = $DB->get_field('tag', 'name', ['id' => $taginstance->tagid]);
-        if (!$tagname || strpos($tagname, 'comp-') !== 0) {
+        $tag = $DB->get_record('tag', ['id' => $taginstance->tagid], 'id, name, rawname');
+        if (!$tag) {
             return;
         }
 
-        $competencycode = substr($tagname, 5);
-
-        $competency = $DB->get_record_select('competency', 'idnumber = ? OR idnumber = ? OR shortname = ? OR shortname = ?', [
-            $tagname,
-            $competencycode,
-            $tagname,
-            $competencycode,
-        ], '*', IGNORE_MULTIPLE);
-
-        if (!$competency) {
-            return;
-        }
+        $rawname = !empty($tag->rawname) ? $tag->rawname : $tag->name;
+        $parts = preg_split('/[,;]+/', $rawname);
 
         $courseid = self::resolve_course_id($taginstance->contextid);
         if ($courseid <= 0) {
             return;
         }
 
-        $DB->delete_records('qbank_comp_ext_qmap', [
-            'questionid'   => $taginstance->itemid,
-            'courseid'     => $courseid,
-            'competencyid' => $competency->id,
-        ]);
+        foreach ($parts as $part) {
+            $part = trim($part);
+            if (empty($part)) {
+                continue;
+            }
+            if (stripos($part, 'comp-') !== 0 && stripos($part, 'comp_') !== 0) {
+                continue;
+            }
+
+            $competencycode = substr($part, 5);
+
+            $competency = $DB->get_record_select('competency', 'idnumber = ? OR idnumber = ? OR shortname = ? OR shortname = ?', [
+                $part,
+                $competencycode,
+                $part,
+                $competencycode,
+            ], '*', IGNORE_MULTIPLE);
+
+            if (!$competency) {
+                continue;
+            }
+
+            $DB->delete_records('qbank_comp_ext_qmap', [
+                'questionid'   => $taginstance->itemid,
+                'courseid'     => $courseid,
+                'competencyid' => $competency->id,
+            ]);
+        }
     }
 
     /**

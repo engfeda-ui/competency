@@ -126,58 +126,65 @@ class competency_column extends column_base {
         // Build array of selected competency IDs from bulk cache.
         $selectedids = self::$coursemapcache[$courseid][$questionid] ?? [];
 
-        // Suggest from question tags (in-memory only; persistence via CLI/cron).
-        if (!isset(self::$tagcache[$questionid])) {
-            self::$tagcache[$questionid] = $DB->get_records_sql("
-            SELECT t.name, t.rawname
-              FROM {tag_instance} ti
-              JOIN {tag} t ON ti.tagid = t.id
-             WHERE ti.itemid = ?
-               AND ti.component = 'core_question'
-               AND ti.itemtype = 'question'
-        ", [$questionid]);
-        }
-        $qtags = self::$tagcache[$questionid];
+        // Suggest from question tags or text matching ONLY for unmapped questions (display only, no DB write).
+        if (empty($selectedids)) {
+            if (!isset(self::$tagcache[$questionid])) {
+                self::$tagcache[$questionid] = $DB->get_records_sql("
+                    SELECT t.name, t.rawname
+                      FROM {tag_instance} ti
+                      JOIN {tag} t ON ti.tagid = t.id
+                     WHERE ti.itemid = ?
+                       AND ti.component = 'core_question'
+                       AND ti.itemtype = 'question'
+                ", [$questionid]);
+            }
+            $qtags = self::$tagcache[$questionid];
 
-        if (!empty($qtags)) {
-            foreach ($qtags as $qtag) {
-                $tagname   = strtolower($qtag->name);
-                $rawname   = strtolower($qtag->rawname);
-                $cleanname = (strpos($tagname, 'comp-') === 0) ? substr($tagname, 5) : $tagname;
+            if (!empty($qtags)) {
+                foreach ($qtags as $qtag) {
+                    $raw = !empty($qtag->rawname) ? $qtag->rawname : $qtag->name;
+                    $parts = preg_split('/[,;]+/', $raw);
+                    foreach ($parts as $part) {
+                        $part = trim($part);
+                        if (empty($part)) {
+                            continue;
+                        }
+                        $partlower = strtolower($part);
+                        $clean = (stripos($partlower, 'comp-') === 0 || stripos($partlower, 'comp_') === 0)
+                            ? substr($partlower, 5)
+                            : $partlower;
 
-                foreach ($this->competencyoptions as $compid => $shortname) {
-                    $complower = strtolower($shortname);
-                    $matches = ($complower === $tagname ||
-                                $complower === $rawname ||
-                                $complower === $cleanname ||
-                                ('comp-' . $complower) === $tagname);
-                    if ($matches) {
-                        if (!in_array($compid, $selectedids)) {
-                            $selectedids[] = $compid;
+                        foreach ($this->competencyoptions as $compid => $shortname) {
+                            $complower = strtolower($shortname);
+                            if ($complower === $partlower || $complower === $clean || ('comp-' . $complower) === $partlower) {
+                                if (!in_array($compid, $selectedids)) {
+                                    $selectedids[] = (int)$compid;
+                                }
+                            }
                         }
                     }
                 }
             }
-        }
 
-        // Suggest via text matching for unmapped questions (display only, no DB write).
-        if (empty($selectedids)) {
-            if ($this->coursecompetencies === null) {
-                $this->coursecompetencies = $DB->get_records_sql("
-                    SELECT c.id, c.shortname, c.idnumber, c.description
-                      FROM {competency} c
-                      JOIN {competency_coursecomp} cc ON cc.competencyid = c.id
-                     WHERE cc.courseid = ?
-                     ORDER BY c.shortname
-                ", [$courseid]);
-            }
+            // Suggest via text matching if still unmapped.
+            if (empty($selectedids)) {
+                if ($this->coursecompetencies === null) {
+                    $this->coursecompetencies = $DB->get_records_sql("
+                        SELECT c.id, c.shortname, c.idnumber, c.description
+                          FROM {competency} c
+                          JOIN {competency_coursecomp} cc ON cc.competencyid = c.id
+                         WHERE cc.courseid = ?
+                         ORDER BY c.shortname
+                    ", [$courseid]);
+                }
 
-            if (!empty($this->coursecompetencies)) {
-                $qtext = ($question->name ?? '') . ' ' . ($question->questiontext ?? '');
-                $suggested = \qbank_comp_ext\auto_mapper::suggest_competency($qtext, $this->coursecompetencies);
+                if (!empty($this->coursecompetencies)) {
+                    $qtext = ($question->name ?? '') . ' ' . ($question->questiontext ?? '');
+                    $suggested = \qbank_comp_ext\auto_mapper::suggest_competency($qtext, $this->coursecompetencies);
 
-                if ($suggested && isset($this->competencyoptions[$suggested->id])) {
-                    $selectedids[] = (int)$suggested->id;
+                    if ($suggested && isset($this->competencyoptions[$suggested->id])) {
+                        $selectedids[] = (int)$suggested->id;
+                    }
                 }
             }
         }
@@ -209,12 +216,12 @@ class competency_column extends column_base {
         // Enhance with autocomplete token UI.
         $PAGE->requires->js_call_amd('core/form-autocomplete', 'enhance', [
             '#' . $elementid,
-            true, // Tags = true to allow token display.
+            false, // Tags = false so user selects from existing competencies only.
             '',
-            get_string('search'),
+            get_string('selectcompetency', 'qbank_comp_ext'),
             false,
             true,
-            get_string('noresults', 'moodle'),
+            get_string('none', 'qbank_comp_ext'),
         ]);
     }
 

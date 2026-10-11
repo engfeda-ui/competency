@@ -5,7 +5,7 @@
 [![PHP Version](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-blue.svg?style=flat-square)](https://php.net)
 [![Database](https://img.shields.io/badge/Database-PostgreSQL%20%7C%20MySQL%20%7C%20MariaDB-purple.svg?style=flat-square)](https://docs.moodle.org)
 [![License](https://img.shields.io/badge/License-GPL%20v3-green.svg?style=flat-square)](http://www.gnu.org/copyleft/gpl.html)
-[![Version](https://img.shields.io/badge/Version-v2.4.5-blue.svg?style=flat-square)](https://github.com/engfeda-ui/competency)
+[![Version](https://img.shields.io/badge/Version-v2.4.6-blue.svg?style=flat-square)](https://github.com/engfeda-ui/competency)
 
 A professional Moodle Question Bank plugin that allows course creators and teachers to link individual questions to specific Moodle competencies. This forms the data foundation of a competency-based assessment and learning analytics system.
 
@@ -125,6 +125,15 @@ graph TD
 ---
 
 ## 📋 Changelog
+
+### v2.4.6 — 2026-10-11
+- **Fix (Moodle 4.0+ Question Schema Compatibility):**
+  - Resolved `dmlreadexception` (`Error reading from database`) in `save_question_competency.php` and `auto_mapper.php` by querying the Moodle 4.0+ question bank tables (`question_bank_entries`, `question_versions`, `question_categories`) instead of deprecated pre-4.0 `question.category`.
+  - Upgraded context ownership validation to correctly support questions located in Quiz Module contexts (`CONTEXT_MODULE`), Course contexts (`CONTEXT_COURSE`), Course Category banks (`CONTEXT_COURSECAT`), and System banks (`CONTEXT_SYSTEM`).
+- **Fix (UI Selection & Tag Synchronization):**
+  - Synchronized question `comp-` tags upon saving competency mappings via external API so tag pills next to question titles stay aligned and in-memory suggestions do not resurrect removed competencies on page reload.
+  - Enhanced `competency_column.php` and `observer.php` to handle multi-competency comma-separated tag strings (e.g. `comp-Operation, comp-Inspection & Testing`).
+  - Corrected `form-autocomplete` configuration in Question Bank column: disabled arbitrary custom tag creation (`tags: false`), replaced confusing `"No results"` with localized `"None"` / `"لا شيء"`, and set placeholder to `"Select competency..."` / `"اختر الجدارة..."`.
 
 ### v2.4.5 — 2026-10-09
 - **Ownership Validation (`external/save_question_competency.php`):**

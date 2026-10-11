@@ -278,17 +278,33 @@ class auto_mapper {
 
         // Fetch course questions that do NOT have a mapping yet in qbank_comp_ext_qmap.
         $context = \context_course::instance($courseid);
-        $questions = (array)$DB->get_records_sql("
-            SELECT DISTINCT q.id, q.name, q.questiontext
-              FROM {question} q
-              JOIN {question_categories} qc ON qc.id = q.category
-             WHERE qc.contextid = :contextid
-               AND q.parent = 0
-               AND NOT EXISTS (
-                   SELECT 1 FROM {qbank_comp_ext_qmap} m
-                    WHERE m.questionid = q.id AND m.courseid = :courseid
-               )
-        ", ['contextid' => $context->id, 'courseid' => $courseid]);
+        if ($DB->get_manager()->table_exists('question_bank_entries')) {
+            $questions = (array)$DB->get_records_sql("
+                SELECT DISTINCT q.id, q.name, q.questiontext
+                  FROM {question} q
+                  JOIN {question_versions} qv ON qv.questionid = q.id
+                  JOIN {question_bank_entries} qbe ON qbe.id = qv.questionbankentryid
+                  JOIN {question_categories} qc ON qc.id = qbe.questioncategoryid
+                 WHERE qc.contextid = :contextid
+                   AND q.parent = 0
+                   AND NOT EXISTS (
+                       SELECT 1 FROM {qbank_comp_ext_qmap} m
+                        WHERE m.questionid = q.id AND m.courseid = :courseid
+                   )
+            ", ['contextid' => $context->id, 'courseid' => $courseid]);
+        } else {
+            $questions = (array)$DB->get_records_sql("
+                SELECT DISTINCT q.id, q.name, q.questiontext
+                  FROM {question} q
+                  JOIN {question_categories} qc ON qc.id = q.category
+                 WHERE qc.contextid = :contextid
+                   AND q.parent = 0
+                   AND NOT EXISTS (
+                       SELECT 1 FROM {qbank_comp_ext_qmap} m
+                        WHERE m.questionid = q.id AND m.courseid = :courseid
+                   )
+            ", ['contextid' => $context->id, 'courseid' => $courseid]);
+        }
 
         // Also include questions actively attempted in quizzes in this course.
         $attemptedquestions = (array)$DB->get_records_sql("
