@@ -79,12 +79,21 @@ class observer {
 
             $competencycode = substr($part, 5);
 
-            // Find competency by idnumber or shortname (case-insensitive).
+            // Find competency scoped to this course by idnumber or shortname (case-insensitive).
             $competency = $DB->get_record_sql("
-                SELECT * FROM {competency}
-                 WHERE LOWER(idnumber) = LOWER(?) OR LOWER(idnumber) = LOWER(?)
-                    OR LOWER(shortname) = LOWER(?) OR LOWER(shortname) = LOWER(?)
-            ", [$part, $competencycode, $part, $competencycode]);
+                SELECT c.*
+                  FROM {competency} c
+                  JOIN {competency_coursecomp} cc ON cc.competencyid = c.id
+                 WHERE cc.courseid = :courseid
+                   AND (LOWER(c.idnumber) = LOWER(:p1) OR LOWER(c.idnumber) = LOWER(:p2)
+                     OR LOWER(c.shortname) = LOWER(:p3) OR LOWER(c.shortname) = LOWER(:p4))
+            ", [
+                'courseid' => $courseid,
+                'p1'       => $part,
+                'p2'       => $competencycode,
+                'p3'       => $part,
+                'p4'       => $competencycode,
+            ], IGNORE_MULTIPLE);
 
             if (!$competency) {
                 continue;
@@ -151,12 +160,20 @@ class observer {
 
             $competencycode = substr($part, 5);
 
-            $competency = $DB->get_record_select('competency', 'idnumber = ? OR idnumber = ? OR shortname = ? OR shortname = ?', [
-                $part,
-                $competencycode,
-                $part,
-                $competencycode,
-            ], '*', IGNORE_MULTIPLE);
+            $competency = $DB->get_record_sql("
+                SELECT c.*
+                  FROM {competency} c
+                  JOIN {competency_coursecomp} cc ON cc.competencyid = c.id
+                 WHERE cc.courseid = :courseid
+                   AND (LOWER(c.idnumber) = LOWER(:p1) OR LOWER(c.idnumber) = LOWER(:p2)
+                     OR LOWER(c.shortname) = LOWER(:p3) OR LOWER(c.shortname) = LOWER(:p4))
+            ", [
+                'courseid' => $courseid,
+                'p1'       => $part,
+                'p2'       => $competencycode,
+                'p3'       => $part,
+                'p4'       => $competencycode,
+            ], IGNORE_MULTIPLE);
 
             if (!$competency) {
                 continue;

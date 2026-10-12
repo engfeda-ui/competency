@@ -5,7 +5,7 @@
 [![PHP Version](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-blue.svg?style=flat-square)](https://php.net)
 [![Database](https://img.shields.io/badge/Database-PostgreSQL%20%7C%20MySQL%20%7C%20MariaDB-purple.svg?style=flat-square)](https://docs.moodle.org)
 [![License](https://img.shields.io/badge/License-GPL%20v3-green.svg?style=flat-square)](http://www.gnu.org/copyleft/gpl.html)
-[![Version](https://img.shields.io/badge/Version-v2.4.7-blue.svg?style=flat-square)](https://github.com/engfeda-ui/moodle-qbank_comp_ext)
+[![Version](https://img.shields.io/badge/Version-v2.4.8-blue.svg?style=flat-square)](https://github.com/engfeda-ui/moodle-qbank_comp_ext)
 
 A professional Moodle Question Bank plugin that allows course creators and teachers to link individual questions to specific Moodle competencies. This forms the data foundation of a competency-based assessment and learning analytics system.
 
@@ -125,6 +125,15 @@ graph TD
 ---
 
 ## 📋 Changelog
+
+### v2.4.8 — 2026-10-12
+- **Fix (Course-Scoped Competency Lookups & Multi-Framework Conflict Resolution):**
+  - **Observer Course Scoping (`classes/observer.php`):** Scoped competency queries in `tag_added` and `tag_removed` strictly to the current course via `{competency_coursecomp}` (`WHERE cc.courseid = :courseid`), eliminating cross-framework collisions on generic competency names (`Operation`, `Troubleshooting`, etc.) across multiple academy programs.
+  - **UI Auto-Sync & IDNumber Matching (`classes/column/competency_column.php`):**
+    - Sanitized cached mappings with `array_intersect` against the course's valid competencies, eliminating lockout from stale/external mappings.
+    - Extended tag matching to check both competency shortname and `idnumber` (e.g. `SPO-OPER`, `comp-Operation`).
+    - Restored automatic database persistence on question bank render for unmapped questions so questions immediately link in the database.
+  - **Quiz Category Auto-Mapping (`classes/auto_mapper.php`):** Expanded category context search in `auto_map_course_questions` to include all Quiz Module contexts (`CONTEXT_MODULE`) belonging to the course, enabling auto-mapping for newly imported/created questions in quizzes before student attempts exist.
 
 ### v2.4.7 — 2026-10-11
 - **Repository Harmonization & Directory Review Alignment:**

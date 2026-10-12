@@ -278,6 +278,20 @@ class auto_mapper {
 
         // Fetch course questions that do NOT have a mapping yet in qbank_comp_ext_qmap.
         $context = \context_course::instance($courseid);
+        $contextids = [(int)$context->id];
+        $quizcontexts = $DB->get_fieldset_sql("
+            SELECT ctx.id
+              FROM {course_modules} cm
+              JOIN {modules} md ON md.id = cm.module AND md.name = 'quiz'
+              JOIN {context} ctx ON ctx.instanceid = cm.id AND ctx.contextlevel = 70
+             WHERE cm.course = :courseid
+        ", ['courseid' => $courseid]);
+        if (!empty($quizcontexts)) {
+            $contextids = array_merge($contextids, array_map('intval', $quizcontexts));
+        }
+        [$ctxsql, $ctxparams] = $DB->get_in_or_equal($contextids, SQL_PARAMS_NAMED, 'ctx');
+        $baseparams = array_merge($ctxparams, ['courseid' => $courseid]);
+
         if ($DB->get_manager()->table_exists('question_bank_entries')) {
             $questions = (array)$DB->get_records_sql("
                 SELECT DISTINCT q.id, q.name, q.questiontext
@@ -285,25 +299,25 @@ class auto_mapper {
                   JOIN {question_versions} qv ON qv.questionid = q.id
                   JOIN {question_bank_entries} qbe ON qbe.id = qv.questionbankentryid
                   JOIN {question_categories} qc ON qc.id = qbe.questioncategoryid
-                 WHERE qc.contextid = :contextid
+                 WHERE qc.contextid $ctxsql
                    AND q.parent = 0
                    AND NOT EXISTS (
                        SELECT 1 FROM {qbank_comp_ext_qmap} m
                         WHERE m.questionid = q.id AND m.courseid = :courseid
                    )
-            ", ['contextid' => $context->id, 'courseid' => $courseid]);
+            ", $baseparams);
         } else {
             $questions = (array)$DB->get_records_sql("
                 SELECT DISTINCT q.id, q.name, q.questiontext
                   FROM {question} q
                   JOIN {question_categories} qc ON qc.id = q.category
-                 WHERE qc.contextid = :contextid
+                 WHERE qc.contextid $ctxsql
                    AND q.parent = 0
                    AND NOT EXISTS (
                        SELECT 1 FROM {qbank_comp_ext_qmap} m
                         WHERE m.questionid = q.id AND m.courseid = :courseid
                    )
-            ", ['contextid' => $context->id, 'courseid' => $courseid]);
+            ", $baseparams);
         }
 
         // Also include questions actively attempted in quizzes in this course.
@@ -332,14 +346,60 @@ class auto_mapper {
         $total = count($questions);
 
         foreach ($questions as $q) {
-            $fulltext = $q->name . ' ' . $q->questiontext;
-            $suggested = self::suggest_competency($fulltext, $competencies);
+            $matchedcompid = 0;
 
-            if ($suggested) {
+            // 1. Try matching tags first against course competencies.
+            $qtags = $DB->get_records_sql("
+                SELECT t.name, t.rawname
+                  FROM {tag_instance} ti
+                  JOIN {tag} t ON ti.tagid = t.id
+                 WHERE ti.itemid = ?
+                   AND ti.component = 'core_question'
+                   AND ti.itemtype = 'question'
+            ", [$q->id]);
+
+            if (!empty($qtags)) {
+                foreach ($qtags as $qtag) {
+                    $raw = !empty($qtag->rawname) ? $qtag->rawname : $qtag->name;
+                    $parts = preg_split('/[,;]+/', $raw);
+                    foreach ($parts as $part) {
+                        $part = trim($part);
+                        if (empty($part)) {
+                            continue;
+                        }
+                        $partlower = strtolower($part);
+                        $clean = (stripos($partlower, 'comp-') === 0 || stripos($partlower, 'comp_') === 0)
+                            ? substr($partlower, 5)
+                            : $partlower;
+
+                        foreach ($competencies as $comp) {
+                            $complower = strtolower($comp->shortname);
+                            $cleanid = strtolower(preg_replace('/^comp[-_]/i', '', $comp->idnumber ?? ''));
+                            if ($complower === $partlower || $complower === $clean
+                                || ('comp-' . $complower) === $partlower
+                                || $cleanid === $clean || ('comp-' . $cleanid) === $partlower) {
+                                $matchedcompid = (int)$comp->id;
+                                break 3;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 2. Fall back to semantic text similarity if no tag matched.
+            if ($matchedcompid <= 0) {
+                $fulltext = $q->name . ' ' . $q->questiontext;
+                $suggested = self::suggest_competency($fulltext, $competencies);
+                if ($suggested) {
+                    $matchedcompid = (int)$suggested->id;
+                }
+            }
+
+            if ($matchedcompid > 0) {
                 $record = (object)[
                     'questionid'   => (int)$q->id,
                     'courseid'     => $courseid,
-                    'competencyid' => (int)$suggested->id,
+                    'competencyid' => $matchedcompid,
                     'timecreated'  => time(),
                 ];
                 try {
