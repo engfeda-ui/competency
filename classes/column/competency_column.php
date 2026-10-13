@@ -113,7 +113,7 @@ class competency_column extends column_base {
             // Deduplicate by normalized shortname so duplicate competency definitions are unified.
             $groups = [];
             foreach ($rawcomps as $comp) {
-                $norm = trim(\core_text::strtolower($comp->shortname));
+                $norm = $this->normalize_competency_name($comp->shortname);
                 $groups[$norm][] = $comp;
             }
 
@@ -287,5 +287,39 @@ class competency_column extends column_base {
      */
     public function get_extra_classes(): array {
         return ['pe-2', 'qbank_comp_ext_column'];
+    }
+/**
+     * Normalize a competency shortname for canonical aliasing.
+     *
+     * Strips punctuation, replaces '&', '+', '/', '\', '-' with spaces,
+     * removes connector words ('and', 'the', 'of', 'و'), and sorts remaining tokens.
+     *
+     * @param string $name
+     * @return string
+     */
+    protected function normalize_competency_name(string $name): string {
+        $str = trim(\core_text::strtolower($name));
+        if ($str === '') {
+            return '';
+        }
+        $str = str_replace(['&', '+', '/', '\\', '-', '_'], ' ', $str);
+        $words = preg_split('/[^\p{L}\p{N}]+/u', $str, -1, PREG_SPLIT_NO_EMPTY);
+        if (empty($words)) {
+            return $str;
+        }
+        $filtered = [];
+        foreach ($words as $w) {
+            if (\core_text::strlen($w) > 2 && \core_text::substr($w, 0, 1) === 'و') {
+                $w = \core_text::substr($w, 1);
+            }
+            if ($w !== 'and' && $w !== 'the' && $w !== 'of' && $w !== 'و') {
+                $filtered[] = $w;
+            }
+        }
+        if (empty($filtered)) {
+            $filtered = $words;
+        }
+        sort($filtered);
+        return implode(' ', $filtered);
     }
 }
