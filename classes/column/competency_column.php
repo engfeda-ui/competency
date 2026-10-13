@@ -46,6 +46,9 @@ class competency_column extends column_base {
     /** @var array|null $coursecompetencies Store full competency records for auto-mapping. */
     protected $coursecompetencies = null;
 
+    /** @var array|null $aliasmap Map of aliased competency IDs to canonical ID. */
+    protected $aliasmap = null;
+
     /** @var array $coursemapcache Bulk-loaded qmap per course: [courseid => [questionid => [compids]]]. */
     protected static $coursemapcache = [];
 
@@ -99,17 +102,39 @@ class competency_column extends column_base {
 
         // Lazy-load full competency records and options for this course.
         if ($this->coursecompetencies === null) {
-            $this->coursecompetencies = $DB->get_records_sql("
+            $rawcomps = $DB->get_records_sql("
                 SELECT c.id, c.shortname, c.idnumber, c.description
                   FROM {competency} c
                   JOIN {competency_coursecomp} cc ON cc.competencyid = c.id
                  WHERE cc.courseid = ?
-                 ORDER BY c.shortname
+                 ORDER BY c.id ASC
             ", [$courseid]);
-            $this->competencyoptions = [];
-            foreach ($this->coursecompetencies as $comp) {
-                $this->competencyoptions[$comp->id] = $comp->shortname;
+
+            // Deduplicate by normalized shortname so duplicate competency definitions are unified.
+            $groups = [];
+            foreach ($rawcomps as $comp) {
+                $norm = trim(\core_text::strtolower($comp->shortname));
+                $groups[$norm][] = $comp;
             }
+
+            $this->coursecompetencies = [];
+            $this->competencyoptions = [];
+            $this->aliasmap = [];
+
+            foreach ($groups as $norm => $group) {
+                $canonicalcomp = $group[0];
+                $canid = (int)$canonicalcomp->id;
+                $this->coursecompetencies[$canid] = $canonicalcomp;
+                $this->competencyoptions[$canid] = $canonicalcomp->shortname;
+
+                foreach ($group as $c) {
+                    $this->aliasmap[(int)$c->id] = $canid;
+                }
+            }
+
+            uasort($this->competencyoptions, function ($a, $b) {
+                return strcasecmp($a, $b);
+            });
         }
 
         if (empty($this->competencyoptions)) {
@@ -126,9 +151,16 @@ class competency_column extends column_base {
             }
         }
 
-        // Build array of selected competency IDs, sanitized strictly against course's valid competencies.
+        // Build array of selected competency IDs, aliased and sanitized strictly against course's canonical competencies.
         $rawselectedids = self::$coursemapcache[$courseid][$questionid] ?? [];
-        $selectedids = array_values(array_intersect($rawselectedids, array_keys($this->competencyoptions)));
+        $mappedselectedids = [];
+        foreach ($rawselectedids as $rawid) {
+            $canid = $this->aliasmap[$rawid] ?? (int)$rawid;
+            if (isset($this->competencyoptions[$canid])) {
+                $mappedselectedids[$canid] = $canid;
+            }
+        }
+        $selectedids = array_values($mappedselectedids);
 
         // Suggest from question tags or text matching for unmapped questions.
         if (empty($selectedids)) {

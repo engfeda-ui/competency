@@ -5,7 +5,7 @@
 [![PHP Version](https://img.shields.io/badge/PHP-8.1%20%7C%208.2%20%7C%208.3-blue.svg?style=flat-square)](https://php.net)
 [![Database](https://img.shields.io/badge/Database-PostgreSQL%20%7C%20MySQL%20%7C%20MariaDB-purple.svg?style=flat-square)](https://docs.moodle.org)
 [![License](https://img.shields.io/badge/License-GPL%20v3-green.svg?style=flat-square)](http://www.gnu.org/copyleft/gpl.html)
-[![Version](https://img.shields.io/badge/Version-v2.4.8-blue.svg?style=flat-square)](https://github.com/engfeda-ui/moodle-qbank_comp_ext)
+[![Version](https://img.shields.io/badge/Version-v2.4.9-blue.svg?style=flat-square)](https://github.com/engfeda-ui/moodle-qbank_comp_ext)
 
 A professional Moodle Question Bank plugin that allows course creators and teachers to link individual questions to specific Moodle competencies. This forms the data foundation of a competency-based assessment and learning analytics system.
 
@@ -125,6 +125,11 @@ graph TD
 ---
 
 ## 📋 Changelog
+
+### v2.4.9 — 2026-10-13
+- **Canonical Competency Deduplication in Question Bank UI (`classes/column/competency_column.php`):**
+  - **Deduplicated Competency Dropdown Options:** Normalized competency definitions by trimmed, lowercased name so that courses with duplicate historical competency records (e.g. `Operation` vs `Operation`, `Troubleshooting` vs `troubleshooting`) present only ONE clean canonical option in the question bank dropdown.
+  - **Dynamic Aliasing of Existing Mappings:** Added an in-memory alias map (`$aliasmap`) that automatically maps any historical question mappings pointing to secondary competency IDs directly to the canonical ID, displaying them properly in the token multi-select widget and preventing instructors from creating redundant, split mappings.
 
 ### v2.4.8 — 2026-10-12
 - **Fix (Course-Scoped Competency Lookups & Multi-Framework Conflict Resolution):**
